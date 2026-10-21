@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Style Board · Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700;800&family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #F4F1EC; color: #222; -webkit-font-smoothing: antialiased; }
+  a { color: inherit; }
+  .top { position: sticky; top: 0; z-index: 10; background: rgba(244,241,236,.92); backdrop-filter: blur(8px); border-bottom: 1px solid #E2DDD4; }
+  .top-in { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .top h1 { font-size: 18px; font-weight: 900; margin-right: auto; }
+  .top h1 a { text-decoration: none; }
+  .tabs { display: flex; gap: 8px; flex-wrap: wrap; }
+  .tabs a { text-decoration: none; font-weight: 800; font-size: 14px; padding: 8px 14px; border-radius: 999px; background: #fff; border: 2px solid #E2DDD4; }
+  .tabs a:hover { border-color: #222; }
+
+  .intro { max-width: 1180px; margin: 0 auto; padding: 40px 16px 8px; }
+  .intro h2 { font-size: clamp(28px, 4vw, 40px); font-weight: 900; letter-spacing: -.5px; }
+  .intro p { font-size: 17px; max-width: 680px; margin-top: 10px; line-height: 1.5; color: #555; }
+
+  section.dir { max-width: 1180px; margin: 32px auto; padding: 0 16px; scroll-margin-top: 80px; }
+  .board { background: var(--bg); color: var(--ink); border-radius: 28px; padding: clamp(20px, 4vw, 40px); box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 12px 40px rgba(0,0,0,.06); }
+  .board-head { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; margin-bottom: 28px; }
+  .letter { width: 56px; height: 56px; border-radius: 18px; background: var(--primary); color: #fff; display: grid; place-items: center; font: 800 28px var(--display); box-shadow: 0 5px 0 var(--primary-dk); flex: none; }
+  .board-head h3 { font: 800 clamp(28px, 4vw, 38px)/1.05 var(--display); }
+  .board-head p { font-size: 16px; opacity: .75; margin-top: 4px; max-width: 560px; line-height: 1.45; }
+
+  .grid { display: grid; grid-template-columns: repeat(12, 1fr); gap: 20px; }
+  .card { background: var(--surface); border-radius: 20px; padding: 20px; border: 2px solid var(--line); }
+  .card h4 { font-size: 12px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; opacity: .55; margin-bottom: 14px; }
+  .c-pal { grid-column: span 7; } .c-type { grid-column: span 5; }
+  .c-comp { grid-column: span 5; } .c-phones { grid-column: span 7; }
+  @media (max-width: 900px) { .c-pal, .c-type, .c-comp, .c-phones { grid-column: span 12; } }
+
+  .swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 12px; }
+  .sw { border-radius: 14px; overflow: hidden; border: 2px solid var(--line); background: var(--surface); }
+  .sw i { display: block; height: 64px; }
+  .sw div { padding: 8px 10px 10px; }
+  .sw b { display: block; font-size: 13px; font-weight: 900; }
+  .sw span { font-size: 12px; opacity: .65; display: block; line-height: 1.3; }
+  .sw code { font-size: 11px; opacity: .5; font-family: ui-monospace, monospace; }
+
+  .type-big { font: 800 44px/1 var(--display); }
+  .type-h { font: 700 22px/1.2 var(--display); margin-top: 14px; }
+  .type-b { font-size: 15px; line-height: 1.5; margin-top: 8px; opacity: .8; }
+  .type-meta { font-size: 12px; opacity: .55; margin-top: 14px; }
+
+  .btn { font: 800 16px var(--display); letter-spacing: .3px; border: 0; border-radius: 16px; padding: 14px 20px; width: 100%; cursor: pointer; text-transform: uppercase; transition: transform .08s, box-shadow .08s; }
+  .btn:active { transform: translateY(4px); box-shadow: 0 0 0 transparent !important; }
+  .btn-p { background: var(--primary); color: #fff; box-shadow: 0 5px 0 var(--primary-dk); }
+  .btn-s { background: var(--surface); color: var(--primary); border: 2px solid var(--line); box-shadow: 0 4px 0 var(--line); }
+  .btn-r { background: var(--reward); color: var(--ink); box-shadow: 0 5px 0 var(--reward-dk); }
+  .stack { display: grid; gap: 14px; }
+  .path { display: flex; align-items: center; justify-content: space-around; padding: 12px 0 4px; }
+  .node { width: 58px; height: 52px; border-radius: 50%; display: grid; place-items: center; font-size: 22px; position: relative; }
+  .node.done { background: var(--reward); box-shadow: 0 6px 0 var(--reward-dk); }
+  .node.now { background: var(--primary); box-shadow: 0 6px 0 var(--primary-dk); outline: 4px solid color-mix(in srgb, var(--primary) 30%, transparent); outline-offset: 5px; }
+  .node.lock { background: var(--locked); box-shadow: 0 6px 0 color-mix(in srgb, var(--locked) 70%, #000); opacity: .9; }
+  .labels { display: flex; justify-content: space-around; font-size: 11px; font-weight: 800; opacity: .6; margin-top: 12px; }
+  .toast { display: flex; gap: 12px; align-items: center; background: color-mix(in srgb, var(--success) 16%, var(--surface)); border: 2px solid var(--success); border-radius: 16px; padding: 12px 14px; }
+  .toast b { font: 800 17px var(--display); color: color-mix(in srgb, var(--success) 70%, #000); }
+  .toast .ic { width: 36px; height: 36px; border-radius: 50%; background: var(--success); color: #fff; display: grid; place-items: center; font-weight: 900; flex: none; }
+
+  /* phones */
+  .phones { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+  .phone-wrap { text-align: center; }
+  .phone-wrap .cap { font-size: 12px; font-weight: 900; letter-spacing: 1px; text-transform: uppercase; opacity: .55; margin-top: 10px; }
+  .phone { width: 236px; height: 480px; border-radius: 34px; background: var(--bg); border: 8px solid #1d1d1f; overflow: hidden; position: relative; display: flex; flex-direction: column; text-align: left; }
+  .phone .status { height: 22px; font-size: 10px; font-weight: 800; padding: 6px 16px 0; display: flex; justify-content: space-between; opacity: .7; }
+
+  /* kid phone */
+  .kid { padding: 6px 14px 14px; display: flex; flex-direction: column; flex: 1; gap: 10px; }
+  .kid .stickers { align-self: flex-start; background: var(--surface); border: 2px solid var(--line); border-radius: 999px; padding: 4px 12px 4px 6px; font: 800 18px var(--display); display: flex; gap: 6px; align-items: center; }
+  .kid .stickers i { width: 26px; height: 26px; border-radius: 50%; background: var(--reward); display: grid; place-items: center; font-style: normal; font-size: 14px; }
+  .bubble { background: var(--surface); border: 2px solid var(--line); border-radius: 18px; padding: 10px 12px; font: 700 20px/1.15 var(--display); position: relative; text-align: center; }
+  .bubble:after { content: ''; position: absolute; left: 50%; bottom: -9px; width: 14px; height: 14px; background: var(--surface); border-right: 2px solid var(--line); border-bottom: 2px solid var(--line); transform: translateX(-50%) rotate(45deg); }
+  .ollie { width: 128px; height: 136px; border-radius: 28px; object-fit: cover; align-self: center; margin-top: 6px; }
+  .redthing { display: flex; justify-content: center; gap: 8px; }
+  .redthing span { width: 34px; height: 34px; border-radius: 10px; }
+  .kid .btn { font-size: 20px; padding: 18px; border-radius: 20px; margin-top: auto; }
+
+  /* grown-up phone */
+  .gu { display: flex; flex-direction: column; flex: 1; }
+  .gu .stats { display: flex; justify-content: space-between; padding: 4px 14px 8px; font-size: 12px; font-weight: 900; }
+  .gu .stats span { display: flex; gap: 4px; align-items: center; }
+  .unit { margin: 0 12px; background: var(--primary); color: #fff; border-radius: 14px; padding: 10px 12px; box-shadow: 0 4px 0 var(--primary-dk); }
+  .unit small { font-size: 9px; font-weight: 900; letter-spacing: 1px; opacity: .8; display: block; }
+  .unit b { font: 700 14px var(--display); }
+  .gu .minipath { position: relative; flex: 1; }
+  .gu .mn { position: absolute; width: 40px; height: 36px; border-radius: 50%; display: grid; place-items: center; font-size: 15px; }
+  .gu .pop { position: absolute; left: 12px; right: 12px; bottom: 12px; background: var(--surface); border: 2px solid var(--line); border-radius: 16px; padding: 12px; }
+  .gu .pop small { font-size: 9px; font-weight: 900; letter-spacing: 1px; opacity: .55; }
+  .gu .pop b { display: block; font: 700 15px/1.2 var(--display); margin: 2px 0 4px; }
+  .gu .pop p { font-size: 11px; opacity: .7; line-height: 1.35; margin-bottom: 10px; }
+  .gu .pop .btn { font-size: 12px; padding: 10px; border-radius: 12px; }
+  .tabbar { display: flex; justify-content: space-around; padding: 8px 0 10px; border-top: 2px solid var(--line); background: var(--surface); font-size: 16px; }
+
+  .rule-note { max-width: 1180px; margin: 0 auto 60px; padding: 0 16px; }
+  .rule-note div { background: #fff; border-radius: 20px; padding: 22px; border: 2px solid #E2DDD4; display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .rule-note b { display: block; font-size: 15px; font-weight: 900; margin-bottom: 4px; }
+  .rule-note p { font-size: 14px; color: #555; line-height: 1.45; }
+</style>
+</head>
+<body>
+<div class="top"><div class="top-in">
+  <h1><a href="index.html">Explore Your Block</a></h1>
+  <nav class="tabs">
+    <a href="#chalk">A · Sidewalk Chalk</a>
+    <a href="#park">B · Park Day</a>
+    <a href="#map">C · Street Map</a>
+  </nav>
+</div></div>
+
+<div class="intro">
+  <h2>Style board: three brand directions</h2>
+  <p>Each direction is one look for every age. The kid version scales the same parts up (bigger type, bigger buttons, fewer words, Ollie talks), in the spirit of Duolingo ABC. The teen and adult version stays playful but clean, closer to Duolingo.</p>
+</div>
+
+<div id="dirs"></div>
+
+<div class="rule-note"><div>
+  <div><b>Same for every age</b><p>Colors, button style, rounded cards, the path, and Ollie.</p></div>
+  <div><b>Kid version turns it up</b><p>Type and buttons about 25% bigger, one task per screen, pictures over words, no map, no camera.</p></div>
+  <div><b>Teen and adult add detail</b><p>Stats bar, unit banner, tab bar, task cards with more text, real map.</p></div>
+</div></div>
+
+<script>
+const DIRS = [
+  {
+    id: 'chalk', letter: 'A', name: 'Sidewalk Chalk',
+    idea: 'Bright chalk colors on a warm sidewalk. Hopscotch, chalk drawings, being outside on your street. The most kid-forward of the three.',
+    display: "'Baloo 2'", fontName: 'Baloo 2 + Nunito',
+    bg: '#FFF7EC', surface: '#FFFFFF', ink: '#2B2D42', line: '#EDE3D3',
+    primary: '#4C6FFF', reward: '#FFC83D', success: '#22B88A', accent: '#FF6F91', locked: '#D8D2C8',
+    roles: [
+      ['primary', 'Chalk Blue', 'Buttons, path, go'],
+      ['reward', 'Sunny Yellow', 'Stars, stickers, done steps'],
+      ['success', 'Mint', 'You found it!'],
+      ['accent', 'Hopscotch Pink', 'Highlights, Ollie moments'],
+      ['ink', 'Asphalt', 'Text'],
+      ['bg', 'Warm Sidewalk', 'Background'],
+    ]
+  },
+  {
+    id: 'park', letter: 'B', name: 'Park Day',
+    idea: 'Warm outdoor colors: brick buildings, sunshine, leaves, sky. Friendly for kids and still at home on an adult outing planner.',
+    display: "'Fredoka'", fontName: 'Fredoka + Nunito',
+    bg: '#FBF5EA', surface: '#FFFFFF', ink: '#2E2A26', line: '#EADFCC',
+    primary: '#E8663D', reward: '#FFBE2E', success: '#3FA66B', accent: '#4FAFE3', locked: '#D9D1C3',
+    roles: [
+      ['primary', 'Brick', 'Buttons, path, go'],
+      ['reward', 'Sunshine', 'Stars, stickers, done steps'],
+      ['success', 'Leaf', 'You found it!'],
+      ['accent', 'Sky', 'Highlights, Ollie moments'],
+      ['ink', 'Bark', 'Text'],
+      ['bg', 'Picnic Cream', 'Background'],
+    ]
+  },
+  {
+    id: 'map', letter: 'C', name: 'Street Map',
+    idea: 'Colors from a printed city map: teal water, coral pins, mustard roads, paper. The most grown-up of the three, still playful.',
+    display: "'Nunito'", fontName: 'Nunito (one family)',
+    bg: '#F5F2E9', surface: '#FFFFFF', ink: '#1B2A41', line: '#E3DDCF',
+    primary: '#0E8A94', reward: '#F2B705', success: '#2FA866', accent: '#FF6B5B', locked: '#D5D0C4',
+    roles: [
+      ['primary', 'Harbor Teal', 'Buttons, path, go'],
+      ['reward', 'Mustard Road', 'Stars, stickers, done steps'],
+      ['success', 'Park Green', 'You found it!'],
+      ['accent', 'Pin Coral', 'Highlights, map pins'],
+      ['ink', 'Navy Ink', 'Text'],
+      ['bg', 'Map Paper', 'Background'],
+    ]
+  }
+];
+
+const dk = c => `color-mix(in srgb, ${c} 72%, #000)`;
+
+document.getElementById('dirs').innerHTML = DIRS.map(d => `
+<section class="dir" id="${d.id}">
+  <div class="board" style="--bg:${d.bg};--surface:${d.surface};--ink:${d.ink};--line:${d.line};--primary:${d.primary};--primary-dk:${dk(d.primary)};--reward:${d.reward};--reward-dk:${dk(d.reward)};--success:${d.success};--accent:${d.accent};--locked:${d.locked};--display:${d.display}, 'Nunito', sans-serif;">
+    <div class="board-head">
+      <div class="letter">${d.letter}</div>
+      <div><h3>${d.name}</h3><p>${d.idea}</p></div>
+    </div>
+    <div class="grid">
+      <div class="card c-pal"><h4>Colors and their jobs</h4>
+        <div class="swatches">${d.roles.map(([k, n, job]) => `
+          <div class="sw"><i style="background:${d[k]}"></i><div><b>${n}</b><span>${job}</span><code>${d[k]}</code></div></div>`).join('')}
+        </div>
+      </div>
+      <div class="card c-type"><h4>Type · ${d.fontName}</h4>
+        <div class="type-big">You found it!</div>
+        <div class="type-h">The 1906 fire on Mission St</div>
+        <div class="type-b">Walk to the corner of 22nd and Mission and look up. The brick building survived the fire that burned most of the block.</div>
+        <div class="type-meta">Headings in the display font, body in Nunito</div>
+      </div>
+      <div class="card c-comp"><h4>Buttons and pieces</h4>
+        <div class="stack">
+          <button class="btn btn-p">Start exploring</button>
+          <button class="btn btn-r">Claim sticker</button>
+          <button class="btn btn-s">Maybe later</button>
+          <div class="toast"><div class="ic">✓</div><b>Nice find, 3 of 5!</b></div>
+          <div>
+            <div class="path">
+              <div class="node done">★</div>
+              <div class="node done">★</div>
+              <div class="node now">📍</div>
+              <div class="node lock">🔒</div>
+            </div>
+            <div class="labels"><span>Done</span><span>Done</span><span>You are here</span><span>Locked</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card c-phones"><h4>Same app, two ages</h4>
+        <div class="phones">
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <div class="kid">
+                <div class="stickers"><i>★</i>3</div>
+                <div class="bubble">Find something red!</div>
+                <img class="ollie" src="assets/ollie.jpg" alt="Ollie the otter">
+                <div class="redthing"><span style="background:#E5484D"></span><span style="background:#FF8A80"></span><span style="background:#B71C1C"></span></div>
+                <button class="btn btn-p">🙌 I found it!</button>
+              </div>
+            </div>
+            <div class="cap">Kid · age 8</div>
+          </div>
+          <div class="phone-wrap">
+            <div class="phone">
+              <div class="status"><span>9:41</span><span>●●●</span></div>
+              <div class="gu">
+                <div class="stats"><span>🔥 6</span><span style="color:${d.reward}">★ 240</span><span>📍 12</span></div>
+                <div class="unit"><small>MISSION ST · UNIT 2</small><b>Hidden history</b></div>
+                <div class="minipath">
+                  <div class="mn" style="left:96px;top:14px;background:var(--reward);box-shadow:0 4px 0 var(--reward-dk)">★</div>
+                  <div class="mn" style="left:56px;top:64px;background:var(--primary);color:#fff;box-shadow:0 4px 0 var(--primary-dk)">📍</div>
+                  <div class="mn" style="left:120px;top:110px;background:var(--locked)">🔒</div>
+                  <div class="pop">
+                    <small>LANDMARK · 0.2 MI</small>
+                    <b>The 1906 fire on Mission St</b>
+                    <p>Find the brick building that survived. Snap a photo to unlock its story.</p>
+                    <button class="btn btn-p">Start +20 XP</button>
+                  </div>
+                </div>
+                <div class="tabbar"><span>🏠</span><span>🗺️</span><span>🏅</span><span>👤</span></div>
+              </div>
+            </div>
+            <div class="cap">Teen or adult</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>`).join('');
+</script>
+</body>
+</html>

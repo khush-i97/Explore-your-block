@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Outline · Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #F4F1EC; color: #222; -webkit-font-smoothing: antialiased; line-height: 1.55; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+  .back { font-weight: 800; font-size: 14px; text-decoration: none; color: #8a8378; }
+  h1 { font-size: clamp(32px, 5vw, 44px); font-weight: 900; letter-spacing: -.5px; margin-top: 12px; line-height: 1.1; }
+  .meta { font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #8a8378; margin-top: 8px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 8px; }
+  nav.toc a { font-size: 13px; font-weight: 800; text-decoration: none; color: #222; background: #fff; border: 2px solid #E2DDD4; border-radius: 999px; padding: 6px 12px; }
+  section { background: #fff; border: 2px solid #E2DDD4; border-radius: 22px; padding: clamp(18px, 3vw, 28px); margin-top: 20px; scroll-margin-top: 16px; }
+  h2 { font-size: 24px; font-weight: 900; margin-bottom: 8px; }
+  .lead { font-size: 17px; font-weight: 700; margin-bottom: 14px; }
+  p { margin-bottom: 12px; color: #333; }
+  .table-wrap { overflow-x: auto; margin: 6px 0 14px; border-radius: 14px; border: 2px solid #EEE9E1; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+  th, td { text-align: left; padding: 10px 12px; vertical-align: top; border-bottom: 1px solid #EEE9E1; }
+  th { background: #FAF8F4; font-weight: 900; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: #6f685d; }
+  tr:last-child td { border-bottom: 0; }
+  td a { color: #2a5bd7; font-weight: 700; }
+  ol, ul { padding-left: 22px; margin-bottom: 12px; }
+  li { margin-bottom: 8px; }
+  li ul { margin-top: 6px; }
+  .pill { display: inline-block; font-size: 11px; font-weight: 900; padding: 2px 8px; border-radius: 999px; }
+  .must { background: #E3F4EA; color: #1f7a45; }
+  .nice { background: #F1EEE8; color: #6f685d; }
+  .skip { background: #F6E9E6; color: #9a4a3a; }
+  .checks li { list-style: none; position: relative; padding-left: 4px; }
+  .checks li:before { content: ''; position: absolute; left: -22px; top: 5px; width: 14px; height: 14px; border: 2px solid #C9C2B6; border-radius: 4px; }
+  b.t { white-space: nowrap; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← Explore Your Block</a>
+  <h1>Project outline</h1>
+  <p class="meta">Team Explore your block · Games track · Wed 21 Oct 2026, Google SF</p>
+  <nav class="toc">
+    <a href="#idea">Idea</a><a href="#ages">Who it changes for</a><a href="#loop">Core loop</a><a href="#screens">Screens</a><a href="#tools">Partner tools</a><a href="#team">Team + timeline</a><a href="#demo">Demo script</a><a href="#questions">Open questions</a>
+  </nav>
+
+  <section id="idea">
+    <h2>The idea</h2>
+    <p class="lead">Explore Your Block is one neighborhood game that turns into the right game for whoever picks it up: a sticker hunt for kids, a local history hunt for teens, an outing planner for adults.</p>
+    <p>Ollie the otter guides everyone along the same Duolingo-style path of places on your block. What changes is what each step holds, what is unlocked, and what is shared.</p>
+    <div class="table-wrap"><table>
+      <tr><th>Judging criterion</th><th>How we answer it</th></tr>
+      <tr><td>It genuinely adapts</td><td>Same screen, three ages, two countries, shown live side by side</td></tr>
+      <tr><td>Real use of the stack</td><td>k-ID decides age, region and parent consent; it switches features on and off</td></tr>
+      <tr><td>It works</td><td>One working slice: onboarding, path, one find, celebration, one locked feature</td></tr>
+      <tr><td>People would use it</td><td>"Get kids, teens and adults out exploring their own block, safely."</td></tr>
+      <tr><td>Ambition</td><td>One app, three experiences, consent built into the game</td></tr>
+    </table></div>
+  </section>
+
+  <section id="ages">
+    <h2>Who it changes for</h2>
+    <p class="lead">One layout and one mascot for everyone; age and country decide what each step holds and what is switched on.</p>
+    <p>k-ID tells the app the player's age band, country and whether a parent has said yes. The app reads that and turns features on or off.</p>
+    <div class="table-wrap"><table>
+      <tr><th></th><th>Kid</th><th>Teen</th><th>Adult</th></tr>
+      <tr><td><b>What a step holds</b></td><td>"Find something red" sticker hunt</td><td>Local history card at a landmark</td><td>Café or outing stop with a local deal</td></tr>
+      <tr><td><b>Home screen</b></td><td>Drawn street, no real map</td><td>Rough area map</td><td>Real map + route</td></tr>
+      <tr><td><b>Prove a find</b></td><td>Arrive at spot + tap "I found it!"</td><td>Photo, checked by AI</td><td>Photo, checked by AI</td></tr>
+      <tr><td><b>Camera</b></td><td>Off</td><td>On</td><td>On</td></tr>
+      <tr><td><b>Location</b></td><td>Zones only (geofence), never shared</td><td>Shared with friends if allowed</td><td>On</td></tr>
+      <tr><td><b>Sharing and friends</b></td><td>Hidden</td><td>Locked until a parent says yes (depends on country)</td><td>On</td></tr>
+      <tr><td><b>Buying</b></td><td>Hidden</td><td>Parent approves</td><td>On</td></tr>
+      <tr><td><b>Look</b></td><td>Big pictures, few words (like Duolingo ABC)</td><td>Playful but clean (like Duolingo)</td><td>Playful but clean, more detail</td></tr>
+    </table></div>
+    <p><b>The country moment for the demo:</b> the same 14-year-old gets different answers in two countries. In the US, a 14-year-old can turn on sharing. In Germany, the digital consent age is 16, so the same teen sees the feature locked with an "Ask a parent" button. k-ID supplies the real rule on the day.</p>
+  </section>
+
+  <section id="loop">
+    <h2>Core loop</h2>
+    <p class="lead">Walk to a place, find the thing, prove it, celebrate, unlock the next step.</p>
+    <ol>
+      <li><b>Pick the next step</b> on the path. A card pops up with the task.</li>
+      <li><b>Walk there.</b> An invisible zone (geofence) around the spot knows when you arrive. For kids, the app only knows "inside the zone", never the exact location.</li>
+      <li><b>Prove the find.</b>
+        <ul>
+          <li>Kid: tap "I found it!" and answer one question from Ollie ("What color was it?").</li>
+          <li>Teen and adult: take a photo. The AI checks it matches ("Is this a mural?").</li>
+        </ul>
+      </li>
+      <li><b>Celebrate.</b> Ollie bounces in, with confetti, a sound, and three score boxes (stickers, places, steps).</li>
+      <li><b>Unlock.</b> The step turns gold, the progress bar fills, the next step opens. Every 5 finds earns a badge.</li>
+    </ol>
+    <p><b>Why no camera for kids:</b> photos of kids, and of strangers on the street, raise privacy problems. Taking the camera away is itself a change the judges can see.</p>
+  </section>
+
+  <section id="screens">
+    <h2>Screens</h2>
+    <p class="lead">Seven screens make the working slice; each must-build screen comes in kid and teen/adult states.</p>
+    <div class="table-wrap"><table>
+      <tr><th>#</th><th>Screen</th><th>Priority</th><th>What changes by age</th><th>Reference</th></tr>
+      <tr><td>1</td><td>Welcome + age check (k-ID)</td><td><span class="pill must">Must</span></td><td>Kid routes to a parent; teen and adult go straight in</td><td><a href="https://mobbin.com/flows/63b774b7-a199-4a57-8bee-54ec27c551a4">Duolingo ABC onboarding</a></td></tr>
+      <tr><td>2</td><td>"Let's ask a grown-up!" parent consent</td><td><span class="pill must">Must</span></td><td>Kids and some teens; Ollie explains, a parent approves</td><td><a href="https://mobbin.com/screens/dd94dbd9-2e7f-4bfe-a54e-0b2779aeb112">Meta Quest parent</a></td></tr>
+      <tr><td>3</td><td>Home path on your block</td><td><span class="pill must">Must</span></td><td>Kid: drawn street. Teen/adult: same path with stats bar and more detail</td><td><a href="https://mobbin.com/screens/d016b202-6612-4df4-918a-b3088415b177">ABC path</a>, <a href="https://mobbin.com/screens/fd077091-e8e9-413f-9aff-bb68984e5b04">Duolingo path</a></td></tr>
+      <tr><td>4</td><td>Step card (the task)</td><td><span class="pill must">Must</span></td><td>Sticker task / history card / café stop</td><td><a href="https://mobbin.com/screens/744fd6c1-6c80-4f80-a4c0-42d68bf882ca">Google Arts &amp; Culture</a></td></tr>
+      <tr><td>5</td><td>Prove the find</td><td><span class="pill must">Must</span></td><td>Kid: "I found it!" + question. Teen/adult: camera</td><td><a href="https://mobbin.com/screens/2b6dd42a-7f2b-45a2-a27d-ebd7f88976b4">Posh scan</a></td></tr>
+      <tr><td>6</td><td>Celebration</td><td><span class="pill must">Must</span></td><td>Copy and rewards change; Ollie stays the same</td><td><a href="https://mobbin.com/screens/fe966528-929c-475b-b917-9b342e3868a5">"Go ahead, brag!"</a></td></tr>
+      <tr><td>7</td><td>Locked feature (sharing or buying)</td><td><span class="pill must">Must</span></td><td>Kid: hidden. Teen: locked + "Ask a parent". Adult: open</td><td><a href="https://mobbin.com/screens/fbef2d10-7767-41e4-8a9f-825e022ead13">Streak Society lock</a></td></tr>
+      <tr><td>8</td><td>Sticker book / badges</td><td><span class="pill nice">Nice</span></td><td>Stickers / landmark badges / visited places</td><td><a href="https://mobbin.com/screens/83509751-7c83-4eeb-ba04-f9e3c37689d3">Finch collection</a></td></tr>
+      <tr><td>9</td><td>Adult outing planner</td><td><span class="pill nice">Nice</span></td><td>Adult only</td><td><a href="https://mobbin.com/screens/9722f766-60c3-4fcd-a7c2-7dfd4ff28513">Wanderlog</a></td></tr>
+      <tr><td>10</td><td>Ollie outfit shop</td><td><span class="pill nice">Nice</span></td><td>Kid: hidden. Teen: parent approves. Adult: buy (FastSpring)</td><td><a href="https://mobbin.com/screens/53295092-90a0-4bba-8acb-6481757faaa5">Duolingo suit</a></td></tr>
+    </table></div>
+  </section>
+
+  <section id="tools">
+    <h2>Partner tools</h2>
+    <p class="lead">k-ID decides what each player sees; the other tools each power one feature that k-ID switches on or off.</p>
+    <div class="table-wrap"><table>
+      <tr><th>Tool</th><th>Job in our app</th><th>What the judges see</th><th>Priority</th></tr>
+      <tr><td><b>k-ID</b></td><td>Age band, country, parent consent; returns which features are allowed</td><td>Same screen changes per player; "Ask a parent" flow</td><td><span class="pill must">Must</span></td></tr>
+      <tr><td><b>Inworld</b></td><td>Ollie's voice: reads tasks aloud for kids, cheers on finds</td><td>Kid hears "Find something red!"</td><td><span class="pill must">Must</span></td></tr>
+      <tr><td><b>AI vision</b></td><td>Checks a teen or adult photo matches the task</td><td>"Yes, that's the mural!"</td><td><span class="pill must">Must</span></td></tr>
+      <tr><td><b>FastSpring</b></td><td>Buy outfits for Ollie, or an adult outing pass</td><td>Kid: no shop. Teen: parent approves. Adult: checkout</td><td><span class="pill nice">Nice</span></td></tr>
+      <tr><td><b>Modulate</b></td><td>Safety check on voice notes teens share</td><td>Only if we build sharing</td><td><span class="pill skip">If time</span></td></tr>
+    </table></div>
+    <p>k-ID's sign-up link and setup steps arrive in Discord on the morning of the event. The screens are designed for its three outcomes (allowed, needs a parent, blocked).</p>
+  </section>
+
+  <section id="team">
+    <h2>Team and timeline</h2>
+    <p class="lead">A working kid-to-adult switch by 1:00 PM, the full slice by 3:00 PM, then polish and rehearsal.</p>
+    <div class="table-wrap"><table>
+      <tr><th>Person</th><th>Owns</th></tr>
+      <tr><td><b>Maya</b></td><td>App setup, k-ID connection, age and country logic, deploy, the pitch</td></tr>
+      <tr><td><b>Khushi</b></td><td>AI photo check, Inworld voice for Ollie, task content per age</td></tr>
+      <tr><td><b>Michelle</b></td><td>Screens and design system, front-end build of the screens, demo flow</td></tr>
+    </table></div>
+    <div class="table-wrap"><table>
+      <tr><th>Time</th><th>Maya</th><th>Khushi</th><th>Michelle</th></tr>
+      <tr><td><b class="t">Before 10:20</b></td><td>Confirm Games track at help desk; k-ID sign-up</td><td>Inworld workspace + API key</td><td>Share designs with the team</td></tr>
+      <tr><td><b class="t">10:20–11:30</b></td><td>App shell, k-ID sign-up working</td><td>Photo check prototype</td><td>Screens 3 and 4 (path + step card)</td></tr>
+      <tr><td><b class="t">11:30–1:00</b></td><td>Age and country switch the features</td><td>Ollie voice lines</td><td>Screens 1 and 2 (age check + parent consent)</td></tr>
+      <tr><td><b class="t">1:00–3:00</b></td><td>Wire screens to k-ID; deploy</td><td>Hook AI into screen 5</td><td>Screens 5, 6, 7 (find, celebrate, locked)</td></tr>
+      <tr><td><b class="t">3:00–4:15</b></td><td>Fix bugs; submission form</td><td>Fix bugs</td><td>Polish; rehearse the demo twice</td></tr>
+      <tr><td><b class="t">4:15–4:30</b></td><td>Submit (deadline 4:30)</td><td>Backup: post in Discord</td><td>Demo phone charged and logged in</td></tr>
+    </table></div>
+    <p>No code before 10:20 AM. Designs and this plan are allowed.</p>
+  </section>
+
+  <section id="demo">
+    <h2>Demo script (2 minutes)</h2>
+    <p class="lead">Open on the change, not the setup. Three phones (or browser tabs) logged in as three players, side by side.</p>
+    <ol>
+      <li><b>0:00–0:15, the line.</b> "Explore Your Block gets kids, teens and adults out exploring their own block. Same app, but it becomes the right game for whoever is holding it."</li>
+      <li><b>0:15–0:45, same screen, three players.</b> The home path as an 8-year-old, a 14-year-old and an adult: drawn street vs map, stickers vs history vs cafés, camera off for the kid.</li>
+      <li><b>0:45–1:10, a kid find.</b> Tap a step. Ollie says "Find something red!" out loud (Inworld). Tap "I found it!", answer Ollie's question, the celebration plays.</li>
+      <li><b>1:10–1:35, the country switch.</b> Same 14-year-old, switch from the US to Germany. Sharing goes from open to locked with "Ask a parent" (k-ID). The parent taps yes; it unlocks.</li>
+      <li><b>1:35–2:00, an adult find + close.</b> The adult snaps a photo of a café; AI confirms it; a local deal unlocks. Close: "One product. k-ID decides what is right for each player."</li>
+    </ol>
+    <p>Backup: if live k-ID fails, a hidden switch sets age and country by hand so the demo still runs.</p>
+  </section>
+
+  <section id="questions">
+    <h2>Open questions</h2>
+    <ul class="checks">
+      <li>Can we change direction from the starting idea? (Maya asked k-ID on 19 Oct.)</li>
+      <li>Web app on a phone, or Android? On-site support covers web and Android.</li>
+      <li>Which two countries does k-ID support best for the demo? US + Germany is the working guess.</li>
+      <li>Which block for the demo content? A real one near 345 Spear St makes it feel live.</li>
+      <li>Which model runs the AI photo check?</li>
+      <li>Who sets up FastSpring and Modulate sandboxes tonight, if we use them?</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

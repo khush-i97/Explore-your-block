@@ -1,0 +1,182 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>k-ID Handoff · Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #F4F1EC; color: #1F2030; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+  main { max-width: 900px; margin: 0 auto; padding: 40px 16px 80px; }
+  .back { font-weight: 800; font-size: 14px; text-decoration: none; color: #8a8378; }
+  h1 { font-size: clamp(30px, 5vw, 42px); font-weight: 900; letter-spacing: -.5px; margin-top: 10px; line-height: 1.1; }
+  .meta { font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #8a8378; margin-top: 6px; }
+  section { background: #fff; border: 2px solid #E2DDD4; border-radius: 22px; padding: clamp(18px, 3vw, 26px); margin-top: 18px; }
+  h2 { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+  .lead { font-weight: 700; margin-bottom: 12px; }
+  p { margin-bottom: 10px; color: #333; }
+  ol, ul { padding-left: 22px; margin-bottom: 10px; } li { margin-bottom: 6px; }
+  code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; background: #F4F1EC; padding: 1px 6px; border-radius: 6px; }
+  pre { background: #1F2030; color: #F4F1EC; border-radius: 16px; padding: 16px; overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 8px 0 12px; }
+  pre code { background: none; padding: 0; color: inherit; }
+  .table-wrap { overflow-x: auto; border-radius: 14px; border: 2px solid #EEE9E1; margin: 6px 0 12px; }
+  table { border-collapse: collapse; width: 100%; font-size: 14px; min-width: 560px; }
+  th, td { text-align: left; padding: 10px 12px; vertical-align: top; border-bottom: 1px solid #EEE9E1; }
+  th { background: #FAF8F4; font-weight: 900; font-size: 12px; letter-spacing: .6px; text-transform: uppercase; color: #6f685d; }
+  tr:last-child td { border-bottom: 0; }
+  a { color: #2a5bd7; font-weight: 700; }
+</style>
+</head>
+<body>
+<main>
+  <a class="back" href="index.html">← Explore Your Block</a>
+  <h1>k-ID integration handoff</h1>
+  <p class="meta">For Maya + Khushi · @k-id/core web SDK · test key</p>
+
+  <section>
+    <h2>The plan in one line</h2>
+    <p class="lead">k-ID's age gate wraps the whole app; our own screens fill its waiting, too-young and said-no states; every feature that changes by age sits inside a <code>KidPermission</code> check.</p>
+    <p>See every screen in the <a href="prototype.html">clickable prototype</a>. The setup below uses the values Michelle chose: Ollie as the icon, k-ID's default privacy and terms links (fine in test mode), and <code>support@example.com</code> as a placeholder support address.</p>
+  </section>
+
+  <section>
+    <h2>1. Install and wrap the app</h2>
+    <pre><code>npm install ./k-id-core-web.tgz</code></pre>
+    <pre><code>import {
+  KidCoreProvider, KidSessionProvider, KidAgeGate,
+  KidAgeGatePass, KidAgeGatePending, KidAgeGateFail,
+  KidAgeGateProhibited, KidAgeGateError,
+} from '@k-id/core'
+
+const declare = {
+  permissions: [
+    { name: 'camera-access' },             // snap a photo to prove a find
+    { name: 'ai-media-upload' },           // the photo goes to the AI check
+    { name: 'photo-video-sharing' },       // share finds with friends (Lena's parent-OK moment)
+    { name: 'send-accept-friend-requests' },
+    { name: 'in-game-purchases' },         // FastSpring: Ollie outfits, adult walk pass
+    { name: 'ai-voice-mode' },             // Inworld: talk to Ollie
+    { name: 'ai-companion-chatbot' },      // Inworld: Ollie as an AI companion
+    { name: 'voice-chat' },                // voice notes to friends, moderated by Modulate
+    { name: 'multiplayer' },               // group outings with other players
+    { name: 'text-chat-private' },         // group chat (filtered for kids)
+    { name: 'real-time-location-sharing' },// share where you are with the group (always off for kids)
+  ],
+  iconUrl: 'https://explore-your-block.vercel.app/assets/ollie-icon.png',
+  supportEmail: 'support@example.com',
+}
+
+// our brand, so k-ID's screens match the app
+const appearance = {
+  variables: {
+    colorPrimary: '#1F2030', colorOnPrimary: '#FFFFFF',
+    colorText: '#1F2030', colorTextMuted: '#6B6A75',
+    colorSurface: '#FFFFFF', colorSurfaceMuted: '#F6F3EE',
+    colorBorder: '#EFE9E0', colorDanger: '#E5484D',
+    fontFamily: "'Nunito', system-ui, sans-serif", radius: '20px',
+  },
+}
+
+export function Root() {
+  return (
+    &lt;KidCoreProvider publishableKey={KID_PUBLISHABLE_KEY}
+      baseUrl="https://kai-api.test.k-id.com/fapi/v1"
+      declare={declare} appearance={appearance}&gt;
+      &lt;KidSessionProvider jurisdiction="auto"
+        sessionId={load('kid.sessionId')} challengeId={load('kid.challengeId')}
+        onSession={(id) =&gt; save('kid.sessionId', id)}
+        onChallenge={(id) =&gt; save('kid.challengeId', id)}
+        onClaim={(token) =&gt; fetch('/api/kid/claim', { method: 'POST', body: JSON.stringify({ token }) })}&gt;
+        &lt;KidAgeGate&gt;
+          &lt;KidAgeGatePending&gt;&lt;WaitingForGrownUp /&gt;&lt;/KidAgeGatePending&gt;
+          &lt;KidAgeGateProhibited&gt;&lt;TooYoungHere /&gt;&lt;/KidAgeGateProhibited&gt;
+          &lt;KidAgeGateFail&gt;&lt;GrownUpSaidNo /&gt;&lt;/KidAgeGateFail&gt;
+          &lt;KidAgeGateError&gt;&lt;CouldNotReachKid /&gt;&lt;/KidAgeGateError&gt;
+          &lt;KidAgeGatePass&gt;&lt;App /&gt;&lt;/KidAgeGatePass&gt;
+        &lt;/KidAgeGate&gt;
+      &lt;/KidSessionProvider&gt;
+    &lt;/KidCoreProvider&gt;
+  )
+}</code></pre>
+    <p>The publishable key and base URL are in k-ID's instructions. The publishable key is safe in the browser. The <b>secret key stays on the server</b>: <code>/api/kid/claim</code> uses it to claim the result from the <code>claimToken</code>.</p>
+  </section>
+
+  <section>
+    <h2>2. Which of our screens fills each k-ID state</h2>
+    <div class="table-wrap"><table>
+      <tr><th>k-ID state</th><th>Our screen</th><th>In the prototype</th></tr>
+      <tr><td>Capture (country, age, ask an adult)</td><td>k-ID's widget, themed with the appearance above, under our welcome screen</td><td>Mia → Let's go</td></tr>
+      <tr><td><code>KidAgeGatePending</code></td><td>"Waiting for a grown-up": night-blue stage, Ollie napping</td><td>Mia → Send to my grown-up</td></tr>
+      <tr><td><code>KidAgeGateProhibited</code></td><td>"Too young to play here": soft stage, Ollie waves goodbye</td><td>Demo panel → Too young</td></tr>
+      <tr><td><code>KidAgeGateFail</code></td><td>"Your grown-up said not yet": Ollie, try again later</td><td>Grown-up's phone → Not now</td></tr>
+      <tr><td><code>KidAgeGateError</code></td><td>"Couldn't reach k-ID": a retry button that remounts <code>KidSessionProvider</code></td><td>(no screen yet)</td></tr>
+      <tr><td><code>KidAgeGatePass</code></td><td>The app: home screen for that player's age</td><td>Any player → home</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>3. Gate each feature</h2>
+    <p class="lead">Show a feature only when k-ID turns it on, and use <code>managedBy</code> to pick the right fallback.</p>
+    <pre><code>// kids without camera get Ollie's quiz instead
+&lt;KidPermission name="camera-access" fallback={&lt;KidQuizProof /&gt;}&gt;
+  &lt;CameraProof /&gt;
+&lt;/KidPermission&gt;
+
+// sharing: GUARDIAN → our "needs a parent's OK" screen, PROHIBITED → hide the button
+const { can, get } = useKidPermission()
+const share = get('photo-video-sharing')
+if (can('photo-video-sharing')) showShare()
+else if (share?.managedBy === 'GUARDIAN') showAskParent()   // Lena, 14, Germany
+// PROHIBITED: render nothing</code></pre>
+    <div class="table-wrap"><table>
+      <tr><th>Permission</th><th>When on</th><th>When off (fallback)</th></tr>
+      <tr><td><code>camera-access</code> + <code>ai-media-upload</code></td><td>Snap a photo, the AI checks it</td><td>Kid quiz: "What was it?"</td></tr>
+      <tr><td><code>photo-video-sharing</code></td><td>Share sheet</td><td>Locked screen with "Ask a parent", or hidden</td></tr>
+      <tr><td><code>in-game-purchases</code></td><td>FastSpring checkout</td><td>Shop hidden, or "Ask a parent"</td></tr>
+      <tr><td><code>ai-voice-mode</code> / <code>ai-companion-chatbot</code></td><td>Talk to Ollie (Inworld)</td><td>Ollie reads tasks aloud only</td></tr>
+      <tr><td><code>voice-chat</code></td><td>Voice notes to friends (Modulate checks them)</td><td>Hidden</td></tr>
+    </table></div>
+  </section>
+
+  <section>
+    <h2>Group mode: the strictest rules win</h2>
+    <p class="lead">When people go out together, show only spots that suit everyone, and turn a feature on only if k-ID allows it for every member.</p>
+    <pre><code>// each member has their own k-ID session (claimed on the backend)
+const groupCan = (name) =&gt; members.every(m =&gt; m.permissions[name] === true)
+const youngest = members.reduce((a, b) =&gt; (a.age &lt; b.age ? a : b))
+const spots = SPOTS.filter(s =&gt; members.every(m =&gt; s.ages.includes(m.band)))
+// banner: "Following {youngest.name}'s rules: location sharing off · chat filtered"
+showLocationSharing = groupCan('real-time-location-sharing')
+showGroupChat      = groupCan('text-chat-private')</code></pre>
+    <p>Purchases stay with each person: the adult buys the Family Outing Pack on their own phone through FastSpring, and it unlocks for the group. Kids never see a buy button.</p>
+  </section>
+
+  <section>
+    <h2>4. Our own age dial (optional)</h2>
+    <p>The prototype's swipe dial can replace k-ID's age input: collect the age ourselves and pass it as <code>age={{ age }}</code> on <code>KidSessionProvider</code> (Tier 3 in the README). Check <code>requirements.approvedAgeCollectionMethods</code> first. If a country only allows date of birth, fall back to k-ID's <code>KidCollectAge</code>.</p>
+    <p>For the UI look, we pick kid, teen or adult from the age (under 13, 13 to 17, 18 and over). <b>Permissions always come from k-ID, never from the age band.</b></p>
+  </section>
+
+  <section>
+    <h2>5. Settings on the Me tab</h2>
+    <pre><code>&lt;KidSettingsProvider sessionId={load('kid.sessionId')} onChallenge={(id) =&gt; save('kid.settingsChallengeId', id)}&gt;
+  &lt;KidSettings /&gt;
+&lt;/KidSettingsProvider&gt;</code></pre>
+    <p>Player-managed permissions get a toggle. Guardian-managed ones ask a grown-up in one email. Prohibited ones are hidden.</p>
+  </section>
+
+  <section>
+    <h2>6. The demo</h2>
+    <ol>
+      <li>Mia, 8, US: welcome → k-ID age gate → pending (parent email) → approve → kid home → quiz instead of camera.</li>
+      <li>Lena, 14, Germany: snap the Golden Fire Hydrant → Share → locked, ask a parent → approved → share.</li>
+      <li>Sam, 32, US: map-first walk → check in with a photo → deal unlocked (FastSpring).</li>
+    </ol>
+    <p>To show two countries live, pass a fixed <code>jurisdiction="US-CA"</code> (California) or <code>"DE"</code> on <code>KidSessionProvider</code> instead of <code>"auto"</code>.</p>
+  </section>
+</main>
+</body>
+</html>

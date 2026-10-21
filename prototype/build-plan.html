@@ -1,0 +1,113 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Build Plan · Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #F4F1EC; color: #1F2030; line-height: 1.5; -webkit-font-smoothing: antialiased; }
+  main { max-width: 860px; margin: 0 auto; padding: 36px 16px 60px; }
+  h1 { font-size: 36px; font-weight: 900; letter-spacing: -.5px; line-height: 1.1; }
+  .meta { font-size: 12.5px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #8a8378; margin-top: 6px; }
+  section { background: #fff; border: 2px solid #E2DDD4; border-radius: 20px; padding: 20px 22px; margin-top: 14px; break-inside: avoid; }
+  h2 { font-size: 20px; font-weight: 900; margin-bottom: 4px; }
+  .lead { font-weight: 700; margin-bottom: 10px; }
+  p { margin-bottom: 8px; color: #333; font-size: 14.5px; }
+  ol, ul { padding-left: 22px; margin-bottom: 8px; font-size: 14.5px; } li { margin-bottom: 5px; }
+  code { font-family: ui-monospace, Menlo, monospace; font-size: 12.5px; background: #F4F1EC; padding: 1px 5px; border-radius: 5px; }
+  pre { background: #1F2030; color: #F4F1EC; border-radius: 14px; padding: 14px; font-size: 12px; line-height: 1.45; margin: 6px 0 10px; white-space: pre-wrap; }
+  pre code { background: none; color: inherit; padding: 0; }
+  table { border-collapse: collapse; width: 100%; font-size: 13.5px; margin: 6px 0 10px; }
+  th, td { text-align: left; padding: 8px 10px; vertical-align: top; border-bottom: 1px solid #EEE9E1; }
+  th { background: #FAF8F4; font-weight: 900; font-size: 11.5px; letter-spacing: .6px; text-transform: uppercase; color: #6f685d; }
+  a { color: #2a5bd7; font-weight: 700; }
+  @media print { body { background: #fff; } main { padding: 0; } section { border-color: #ddd; } }
+  @page { margin: 14mm; }
+</style>
+</head>
+<body>
+<main>
+  <h1>Explore Your Block: build plan</h1>
+  <p class="meta">Team Explore your block · Games track · Build for Everyone, Wed 21 Oct 2026</p>
+
+  <section>
+    <h2>The product in one line</h2>
+    <p class="lead">One neighborhood outing app that reshapes for whoever is looking: kid spots for kids, hangouts for teens, a full planner for adults, and for a mixed group only the spots that work for everyone, under the youngest person's k-ID rules.</p>
+    <p>Visual prototype (the reference for every screen): <a href="https://explore-your-block.vercel.app/prototype.html">explore-your-block.vercel.app/prototype.html</a><br>
+    k-ID setup details: <a href="https://explore-your-block.vercel.app/kid-handoff.html">explore-your-block.vercel.app/kid-handoff.html</a></p>
+  </section>
+
+  <section>
+    <h2>How it fits together</h2>
+    <pre><code>Browser (React + Vite)
+  KidCoreProvider → KidSessionProvider → age gate (k-ID)
+     pending  → "Waiting for a grown-up" screen
+     pass     → our app screens, fed REAL permissions from k-ID
+        Ollie talks        → /api/ollie/speak     (Inworld)
+        "What can we do?"  → /api/voice/listen    (Modulate)
+        Buy the pack       → FastSpring checkout  → /api/pack/webhook
+     claimToken          → /api/kid/claim       (k-ID, secret key)
+
+Vercel (same project): /api/* serverless functions hold every secret key</code></pre>
+    <p>The front end and back end live in one repo and deploy together on Vercel. Secret keys live only in Vercel's environment variables, never in the code or the browser.</p>
+  </section>
+
+  <section>
+    <h2>Back-end endpoints</h2>
+    <table>
+      <tr><th>Endpoint</th><th>Partner</th><th>What it does</th><th>Secret it needs</th></tr>
+      <tr><td><code>POST /api/kid/claim</code></td><td>k-ID</td><td>Redeems the one-time <code>claimToken</code> (valid 10 minutes) at k-ID's <code>/client/claim</code>, saves the player's age band and permissions</td><td><code>KID_SECRET_KEY</code></td></tr>
+      <tr><td><code>POST /api/ollie/speak</code></td><td>Inworld</td><td>Text → Ollie's voice (audio); tone changes for kid, teen, adult or group</td><td><code>INWORLD_API_KEY</code></td></tr>
+      <tr><td><code>POST /api/voice/listen</code></td><td>Modulate</td><td>Audio → text + emotion ("sounds excited"); redacts personal details for kids and teens</td><td><code>MODULATE_API_KEY</code></td></tr>
+      <tr><td><code>POST /api/pack/webhook</code></td><td>FastSpring</td><td>Confirms the Family Outing Pack order, then unlocks it for the group</td><td><code>FASTSPRING_WEBHOOK_SECRET</code></td></tr>
+      <tr><td><code>GET /api/spots?members=…</code></td><td>(ours)</td><td>Returns the spots that suit everyone in the group, plus the strictest rules</td><td>none</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Build order</h2>
+    <ol>
+      <li><b>React app + real k-ID age gate</b> wrapping the prototype screens. Deploy. This alone is a working demo.</li>
+      <li><b>/api/kid/claim</b> with the secret key; permissions drive every screen.</li>
+      <li><b>Ollie's real voice</b> (Inworld) on "Find something red!" and the group answer.</li>
+      <li><b>Voice input</b> (Modulate) for "What can we all do?"</li>
+      <li><b>FastSpring checkout</b> for the Family Outing Pack (sandbox).</li>
+    </ol>
+    <p>Stop adding features at 3:00 PM. 3:00 to 4:15 is fixing and rehearsing. Submit before 4:30 PM.</p>
+  </section>
+
+  <section>
+    <h2>Keys: where they go</h2>
+    <ul>
+      <li>Vercel project → Settings → Environment Variables. Add each key there by name (table above).</li>
+      <li>For local runs, put them in a <code>.env.local</code> file that is listed in <code>.gitignore</code>. Never commit it.</li>
+      <li>The k-ID <b>publishable</b> key is the only key that may appear in front-end code.</li>
+      <li>Never paste keys into chat, Discord or the repo.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Who does what</h2>
+    <table>
+      <tr><th>Person</th><th>Owns</th></tr>
+      <tr><td>Michelle</td><td>Visual prototype, screens, the demo walkthrough, the React shell around the prototype</td></tr>
+      <tr><td>Maya</td><td>k-ID integration + /api/kid/claim, group logic, deploy, the pitch</td></tr>
+      <tr><td>Khushi</td><td>Inworld voice for Ollie, Modulate voice input, the AI photo check</td></tr>
+    </table>
+  </section>
+
+  <section>
+    <h2>Open questions for the k-ID helpers</h2>
+    <ul>
+      <li>The full server URL and auth header for redeeming a <code>claimToken</code> at <code>/client/claim</code> with the secret key.</li>
+      <li>Do the US-CA and DE test jurisdictions give the consent ages we expect (13 in California, 16 in Germany)?</li>
+      <li>Can a test session be forced to a specific age and country for a live demo?</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

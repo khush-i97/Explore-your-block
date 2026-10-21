@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ollie · Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,400..800&family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+<script src="assets/ollie.js"></script>
+<style>
+  :root {
+    --bg: #FFF7EC; --surface: #FFFFFF; --ink: #1F2030; --ink-2: #6B6A75; --ink-3: #A19FA8; --line: #EFE9E0;
+    --blue: #4C6FFF; --yellow: #FFC83D; --mint: #22B88A; --pink: #FF6F91; --fur: #C98552;
+    --sky: #BFE3FF; --display: 'Bricolage Grotesque', 'Nunito', sans-serif;
+    --soft: 0 10px 24px rgba(31,32,48,.10), 0 2px 6px rgba(31,32,48,.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: var(--bg); color: var(--ink); -webkit-font-smoothing: antialiased; }
+  .disp { font-family: var(--display); font-stretch: 78%; font-weight: 800; letter-spacing: -.5px; }
+  .top { max-width: 1180px; margin: 0 auto; padding: 14px 16px; display: flex; gap: 12px; align-items: center; }
+  .top h1 { font: 800 20px var(--display); margin-right: auto; }
+  .top a { text-decoration: none; color: inherit; }
+  .top nav a { font-size: 13px; font-weight: 800; color: var(--ink-2); padding: 8px 12px; border-radius: 999px; }
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 16px 60px; }
+  .label { font-size: 12px; font-weight: 900; letter-spacing: 1.4px; text-transform: uppercase; color: var(--ink-2); margin: 40px 0 14px; }
+  h2 { font-size: clamp(44px, 7vw, 76px); line-height: .92; margin-top: 20px; }
+  .intro { font-size: 17px; line-height: 1.5; color: var(--ink-2); margin-top: 12px; max-width: 600px; }
+
+  /* mood stage */
+  .stage { background: var(--surface); border-radius: 32px; box-shadow: var(--soft); padding: 24px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px; align-items: stretch; }
+  @media (max-width: 820px) { .stage { grid-template-columns: 1fr; } }
+  .stage-art { border-radius: 26px; overflow: hidden; position: relative; min-height: 380px; background: linear-gradient(#BFE3FF, #E6F4FF 70%); display: flex; align-items: flex-end; justify-content: center; }
+  .stage-art .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .stage-art ollie-otter { width: 240px; position: relative; z-index: 1; margin-bottom: -6px; }
+  .moods { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+  .mood { border: 0; background: var(--bg); border-radius: 20px; padding: 16px; text-align: left; cursor: pointer; font-family: inherit; color: var(--ink); box-shadow: inset 0 0 0 2px var(--line); transition: transform .12s; }
+  .mood:active { transform: scale(.97); }
+  .mood[aria-pressed=true] { background: var(--ink); color: #fff; box-shadow: none; }
+  .mood[aria-pressed=true] span { color: rgba(255,255,255,.7); }
+  .mood b { display: block; font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 21px; }
+  .mood span { font-size: 13.5px; color: var(--ink-2); line-height: 1.35; display: block; margin-top: 2px; }
+  .tip { font-size: 14px; color: var(--ink-2); grid-column: 1 / -1; display: flex; gap: 6px; align-items: center; }
+
+  /* phones */
+  .phones { display: flex; gap: 36px; justify-content: center; flex-wrap: wrap; }
+  .phone-wrap { text-align: center; }
+  .cap { font-size: 12px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-2); margin-top: 12px; }
+  .phone { width: 310px; height: 650px; border-radius: 46px; border: 10px solid #15161f; overflow: hidden; position: relative; text-align: left; background: #fff; }
+  .scenebox { position: absolute; left: 0; right: 0; top: 0; overflow: hidden; background: linear-gradient(#BFE3FF, #E6F4FF 75%); }
+  .scenebox .scene { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .status { position: absolute; top: 0; left: 0; right: 0; z-index: 3; height: 34px; font-size: 12px; font-weight: 800; padding: 12px 24px 0; display: flex; justify-content: space-between; color: var(--ink); }
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: #fff; border-radius: 30px 30px 0 0; z-index: 2; box-shadow: 0 -8px 24px rgba(31,32,48,.08); }
+  .peek { position: absolute; z-index: 1; left: 50%; transform: translateX(-50%); }
+
+  /* kid */
+  .p-kid .scenebox { height: 330px; }
+  .p-kid .peek { top: 118px; }
+  .p-kid .peek ollie-otter { width: 200px; }
+  .p-kid .sheet { top: 300px; padding: 22px 20px 22px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+  .count { position: absolute; z-index: 3; top: 44px; left: 18px; display: flex; gap: 6px; }
+  .count i { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; border: 3px solid #fff; box-shadow: 0 3px 8px rgba(31,32,48,.18); font-size: 15px; color: #fff; }
+  .say { border: 0; cursor: pointer; font-family: inherit; display: inline-flex; gap: 6px; align-items: center; font-size: 12px; font-weight: 900; letter-spacing: 1px; color: var(--blue); background: #EEF1FF; border-radius: 999px; padding: 6px 12px; }
+  .p-kid h3 { font-size: 46px; line-height: .92; margin-top: 12px; }
+  .dots { display: flex; gap: 12px; margin-top: 18px; }
+  .dots i { width: 44px; height: 44px; border-radius: 50%; border: 5px solid #fff; box-shadow: 0 4px 12px rgba(31,32,48,.16); }
+  .bigbtn { margin-top: auto; width: 100%; border: 0; border-radius: 999px; padding: 20px; font-family: var(--display); font-stretch: 85%; font-weight: 800; font-size: 26px; color: #fff; cursor: pointer;
+            background: radial-gradient(120% 140% at 30% 0%, #5FD8B0 0%, var(--mint) 55%, #149872 100%); box-shadow: 0 12px 22px rgba(34,184,138,.32), inset 0 2px 0 rgba(255,255,255,.35), inset 0 -4px 0 rgba(0,0,0,.1); transition: transform .12s; }
+  .bigbtn:active { transform: scale(.96); }
+
+  /* teen / adult */
+  .p-gu .scenebox { height: 250px; }
+  .p-gu .scenebox:after { content: ''; position: absolute; inset: 0; background: linear-gradient(rgba(24,26,44,.55), rgba(24,26,44,0) 55%); }
+  .p-gu .status { color: #fff; }
+  .p-gu .hello h3 { color: #fff; text-shadow: 0 2px 12px rgba(0,0,0,.25); }
+  .p-gu .hello small { color: rgba(255,255,255,.8) !important; }
+  .p-gu .peek { top: 104px; left: 72%; }
+  .p-gu .peek ollie-otter { width: 128px; }
+  .p-gu .hello { position: absolute; z-index: 3; top: 44px; left: 20px; }
+  .p-gu .hello small { font-size: 12.5px; font-weight: 800; color: rgba(31,32,48,.6); }
+  .p-gu .hello h3 { font-size: 34px; line-height: .95; }
+  .p-gu .stat { position: absolute; z-index: 3; top: 118px; left: 20px; display: inline-flex; gap: 6px; align-items: center; background: rgba(255,255,255,.85); backdrop-filter: blur(8px); border-radius: 999px; padding: 6px 12px; font-size: 13px; font-weight: 900; }
+  .p-gu .stat i { color: var(--mint); font-size: 15px; }
+  .p-gu .sheet { top: 222px; padding: 20px 18px 0; }
+  .eyebrow { font-size: 11px; font-weight: 900; letter-spacing: 1.2px; text-transform: uppercase; color: var(--ink-3); }
+  .next { margin-top: 8px; border-radius: 22px; background: #F6F3EE; padding: 16px; }
+  .next h4 { font-size: 26px; line-height: .98; }
+  .meta { display: flex; gap: 12px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); margin-top: 8px; }
+  .meta span { display: inline-flex; gap: 4px; align-items: center; }
+  .pill { margin-top: 14px; display: inline-flex; gap: 8px; align-items: center; border: 0; border-radius: 999px; background: var(--ink); color: #fff; font: 800 15px 'Nunito'; padding: 12px 18px; cursor: pointer; }
+  .near { margin-top: 16px; display: grid; gap: 4px; }
+  .row { display: flex; align-items: center; gap: 12px; padding: 8px 2px; }
+  .row .th { width: 44px; height: 44px; border-radius: 14px; flex: none; display: grid; place-items: center; font-size: 20px; color: #fff; }
+  .row b { display: block; font-size: 14.5px; font-weight: 800; }
+  .row small { font-size: 12px; color: var(--ink-2); font-weight: 600; }
+  .row .lock { margin-left: auto; color: var(--ink-3); font-size: 18px; }
+
+  .navwrap { position: absolute; z-index: 4; left: 16px; right: 16px; bottom: 16px; display: flex; gap: 10px; align-items: center; }
+  .nav { flex: 1; height: 60px; background: rgba(246,243,238,.92); backdrop-filter: blur(12px); border-radius: 999px; display: flex; justify-content: space-around; align-items: center; box-shadow: 0 8px 24px rgba(31,32,48,.12); }
+  .nav button { border: 0; background: none; cursor: pointer; width: 48px; height: 44px; border-radius: 999px; display: grid; place-items: center; color: var(--ink-3); font-size: 23px; transition: background .15s, color .15s; }
+  .nav button.on { background: #fff; color: var(--ink); box-shadow: 0 2px 8px rgba(31,32,48,.1); }
+  .fab { width: 60px; height: 60px; border-radius: 50%; border: 0; background: var(--ink); color: #fff; font-size: 26px; display: grid; place-items: center; cursor: pointer; box-shadow: 0 10px 22px rgba(31,32,48,.3); transition: transform .12s; }
+  .fab:active { transform: scale(.93); }
+
+  .notes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 28px; }
+  @media (max-width: 820px) { .notes { grid-template-columns: 1fr; } }
+  .notes div { background: var(--surface); border-radius: 22px; padding: 18px; box-shadow: var(--soft); }
+  .notes b { display: block; font-family: var(--display); font-stretch: 80%; font-weight: 800; font-size: 21px; }
+  .notes p { font-size: 14px; color: var(--ink-2); line-height: 1.45; margin-top: 4px; }
+</style>
+</head>
+<body>
+
+
+
+<div class="top">
+  <h1><a href="index.html">Explore Your Block</a></h1>
+  <nav><a href="prototype.html">Prototype</a><a href="styleboard.html">Style board</a><a href="outline.html">Outline</a></nav>
+</div>
+
+<div class="wrap">
+  <h2 class="disp">Meet Ollie</h2>
+  <p class="intro">Your guide around the block. Ollie lives on your street and reacts to what you do: waves hello, hunts with you, cheers when you find something, naps when you've been away.</p>
+
+  <div class="label">Moods</div>
+  <div class="stage">
+    <div class="stage-art" data-scene><ollie-otter id="hero" mood="idle"></ollie-otter></div>
+    <div class="moods">
+      <button class="mood" data-mood="idle" aria-pressed="true"><b>Hanging out</b><span>Breathes, blinks, sways. Home screen.</span></button>
+      <button class="mood" data-mood="wave" aria-pressed="false"><b>Hello!</b><span>Bounces side to side. Welcome and onboarding.</span></button>
+      <button class="mood" data-mood="search" aria-pressed="false"><b>On the hunt</b><span>Magnifying glass sweeps. During a task.</span></button>
+      <button class="mood" data-mood="cheer" aria-pressed="false"><b>You found it!</b><span>Jumps, happy eyes, sparkles. Celebration.</span></button>
+      <button class="mood" data-mood="sleep" aria-pressed="false"><b>Napping</b><span>Eyes closed, zzz. When you've been away.</span></button>
+      <button class="mood" data-talk="1" aria-pressed="false"><b>Talking</b><span>Mouth moves while Ollie reads a task out loud.</span></button>
+      <button class="mood" data-pop="1" aria-pressed="false"><b>Pop up</b><span>Springs up into view when a screen opens.</span></button>
+      <p class="tip"><i class="ph ph-hand-tap"></i>Tap Ollie to tickle.</p>
+    </div>
+  </div>
+
+  <div class="label">Same app, two ages</div>
+  <div class="phones">
+    <div class="phone-wrap">
+      <div class="phone p-kid">
+        <div class="scenebox" data-scene></div>
+        <div class="status"><span>9:41</span><span>●●●</span></div>
+        <div class="count"><i style="background:var(--yellow)">★</i><i style="background:var(--pink)">★</i><i style="background:var(--mint)">★</i></div>
+        <div class="peek"><ollie-otter id="kidOllie" mood="search"></ollie-otter></div>
+        <div class="sheet">
+          <button class="say" id="kidSay"><i class="ph-fill ph-speaker-high"></i>Ollie says</button>
+          <h3 class="disp">Find something red!</h3>
+          <div class="dots"><i style="background:#E5484D"></i><i style="background:#FF8A80"></i><i style="background:#B71C1C"></i></div>
+          <button class="bigbtn" id="kidFound">I found it!</button>
+        </div>
+      </div>
+      <div class="cap">Kid · Ollie up front, one task</div>
+    </div>
+
+    <div class="phone-wrap">
+      <div class="phone p-gu">
+        <div class="scenebox" data-scene="evening"></div>
+        <div class="status"><span>9:41</span><span>●●●</span></div>
+        <div class="hello"><small>Good evening, Sam</small><h3 class="disp">Mission St</h3></div>
+        <div class="stat"><i class="ph-fill ph-seal-check"></i>12 finds</div>
+        <div class="peek"><ollie-otter mood="idle"></ollie-otter></div>
+        <div class="sheet">
+          <div class="eyebrow">Next stop · Landmark</div>
+          <div class="next">
+            <h4 class="disp">The building that survived 1906</h4>
+            <div class="meta"><span><i class="ph ph-map-pin"></i>0.2 mi</span><span><i class="ph ph-clock"></i>10 min</span><span><i class="ph ph-camera"></i>Photo</span></div>
+            <button class="pill">Start <i class="ph-bold ph-arrow-right"></i></button>
+          </div>
+          <div class="near">
+            <div class="eyebrow" style="margin-top:6px">Nearby</div>
+            <div class="row"><div class="th" style="background:#FF8FA8"><i class="ph-fill ph-paint-brush-broad"></i></div><div><b>Balmy Alley murals</b><small>Art · 0.4 mi</small></div></div>
+            <div class="row"><div class="th" style="background:#C98552"><i class="ph-fill ph-coffee"></i></div><div><b>Coffee on 24th</b><small>Food · local deal</small></div><i class="ph ph-lock-simple lock"></i></div>
+          </div>
+        </div>
+        <div class="navwrap">
+          <nav class="nav" aria-label="Main">
+            <button class="on" aria-label="Home"><i class="ph-fill ph-house"></i></button>
+            <button aria-label="Map"><i class="ph ph-map-trifold"></i></button>
+            <button aria-label="Finds"><i class="ph ph-seal-check"></i></button>
+            <button aria-label="Me"><i class="ph ph-user"></i></button>
+          </nav>
+          <button class="fab" aria-label="Snap a find"><i class="ph-fill ph-camera"></i></button>
+        </div>
+      </div>
+      <div class="cap">Teen or adult · clean, Ollie in the scene</div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <div><b>One street, every age</b><p>Ollie always stands on your block at the top. The white sheet below holds the content, and that is what changes by age.</p></div>
+    <div><b>Kid</b><p>Ollie is big and talks. One task, color hints, one giant button. Stars along the top count finds.</p></div>
+    <div><b>Teen and adult</b><p>Ollie steps back into the scene. Tight bold headlines, black pill buttons, a nearby list, a floating bar with a camera button.</p></div>
+  </div>
+</div>
+
+<script>
+  const PAL = {
+    day:     { sky1:'#BFE3FF', sky2:'#E6F4FF', sun:'#FFE08A', cloud:'#fff', b1:'#FFB4A2', b2:'#A8C5FF', roof:'#7F9EF0', b3:'#FFD27A', stripe:'#FF8FA8', b4:'#9FE0C8', win:'#fff', winO:.85, tree:'#5FBF7F', walk:'#E9E3D8', kid:true },
+    evening: { sky1:'#7E8DBB', sky2:'#F3C9A8', sun:'#FFD6A0', cloud:'#fff', b1:'#B9826E', b2:'#5F6F96', roof:'#4C5A7E', b3:'#C9A36F', stripe:'#8E5F55', b4:'#7F9E8E', win:'#FFE1A1', winO:.95, tree:'#4F7A5E', walk:'#D8D0C4', kid:false }
+  };
+  const scene = (c) => `<svg class="scene" viewBox="0 0 320 330" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+    <defs><linearGradient id="sky-${c.kid?'d':'e'}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${c.sky1}"/><stop offset=".85" stop-color="${c.sky2}"/></linearGradient></defs>
+    <rect width="320" height="330" fill="url(#sky-${c.kid?'d':'e'})"/>
+    <circle cx="262" cy="${c.kid?58:118}" r="${c.kid?22:26}" fill="${c.sun}" opacity="${c.kid?1:.85}"/>
+    <g fill="${c.cloud}" opacity="${c.kid?.9:.35}"><ellipse cx="70" cy="62" rx="30" ry="11"/><ellipse cx="92" cy="54" rx="20" ry="12"/><ellipse cx="200" cy="96" rx="22" ry="8"/></g>
+    <g>
+      <rect x="-6" y="150" width="70" height="120" rx="6" fill="${c.b1}"/><g fill="${c.win}" opacity="${c.winO}"><rect x="8" y="170" width="16" height="20" rx="3"/><rect x="34" y="170" width="16" height="20" rx="3"/><rect x="8" y="204" width="16" height="20" rx="3"/></g>
+      <rect x="60" y="120" width="64" height="150" rx="6" fill="${c.b2}"/><path d="M56 124 L92 96 L128 124 Z" fill="${c.roof}"/><g fill="${c.win}" opacity="${c.winO}"><rect x="74" y="146" width="14" height="20" rx="3"/><rect x="98" y="146" width="14" height="20" rx="3"/><rect x="74" y="180" width="14" height="20" rx="3"/><rect x="98" y="180" width="14" height="20" rx="3"/></g>
+      <rect x="200" y="136" width="74" height="134" rx="6" fill="${c.b3}"/><g fill="${c.win}" opacity="${c.winO}"><rect x="212" y="152" width="18" height="22" rx="3"/><rect x="242" y="152" width="18" height="22" rx="3"/></g><rect x="200" y="190" width="74" height="10" fill="${c.stripe}"/>
+      <rect x="270" y="110" width="60" height="160" rx="6" fill="${c.b4}"/><g fill="${c.win}" opacity="${c.winO}"><rect x="282" y="128" width="14" height="18" rx="3"/><rect x="282" y="160" width="14" height="18" rx="3"/></g>
+    </g>
+    <g fill="${c.tree}"><circle cx="150" cy="196" r="26"/><circle cx="176" cy="206" r="20"/><rect x="158" y="214" width="6" height="40" fill="#6E5440"/></g>
+    <rect x="-10" y="250" width="340" height="90" fill="${c.walk}"/>
+    ${c.kid ? `<g stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round" opacity=".9"><rect x="22" y="272" width="22" height="22" rx="2"/><rect x="44" y="272" width="22" height="22" rx="2"/><rect x="33" y="294" width="22" height="22" rx="2"/><path d="M250 286 c 10 -14, 26 -14, 34 0"/><circle cx="296" cy="300" r="6"/></g>`
+            : `<g><rect x="186" y="170" width="4" height="84" fill="#3E4258"/><path d="M180 172 h16 l-3 -10 h-10 z" fill="#3E4258"/><circle cx="188" cy="176" r="10" fill="#FFE1A1" opacity=".35"/></g>`}
+  </svg>`;
+  document.querySelectorAll('[data-scene]').forEach(el => el.insertAdjacentHTML('afterbegin', scene(PAL[el.dataset.scene || 'day'])));
+
+  const hero = document.getElementById('hero');
+  document.querySelectorAll('.mood').forEach(b => b.addEventListener('click', () => {
+    if (b.dataset.talk) { hero.setAttribute('mood', 'idle'); hero.say(2400); }
+    else if (b.dataset.pop) { hero.setAttribute('mood', 'idle'); hero.popIn(); }
+    else hero.setAttribute('mood', b.dataset.mood);
+    document.querySelectorAll('.mood').forEach(x => x.setAttribute('aria-pressed', x === b));
+  }));
+
+  const kid = document.getElementById('kidOllie');
+  const kidTalk = () => { kid.setAttribute('mood', 'idle'); kid.say(1900); setTimeout(() => kid.setAttribute('mood', 'search'), 1900); };
+  document.getElementById('kidSay').addEventListener('click', kidTalk);
+  setTimeout(kidTalk, 900);
+  document.getElementById('kidFound').addEventListener('click', () => {
+    kid.setAttribute('mood', 'cheer');
+    setTimeout(() => kid.setAttribute('mood', 'search'), 2600);
+  });
+
+  document.querySelectorAll('.nav button').forEach(b => b.addEventListener('click', () => {
+    b.parentNode.querySelectorAll('button').forEach(x => {
+      x.classList.toggle('on', x === b);
+      const i = x.querySelector('i');
+      i.className = i.className.replace(/^ph(-fill)? /, x === b ? 'ph-fill ' : 'ph ');
+    });
+  }));
+</script>
+</body>
+</html>

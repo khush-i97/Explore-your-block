@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Explore Your Block</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;800;900&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', system-ui, sans-serif; background: #F4F1EC; color: #222; min-height: 100vh; -webkit-font-smoothing: antialiased; }
+  main { max-width: 760px; margin: 0 auto; padding: 56px 16px; }
+  .hero { display: flex; gap: 24px; align-items: center; flex-wrap: wrap; }
+  .hero img { width: 120px; height: 128px; object-fit: cover; border-radius: 30px; box-shadow: 0 10px 30px rgba(0,0,0,.08); }
+  h1 { font-size: clamp(34px, 6vw, 52px); font-weight: 900; letter-spacing: -1px; line-height: 1; }
+  .sub { font-size: 18px; color: #555; margin-top: 10px; line-height: 1.45; max-width: 520px; }
+  .meta { font-size: 13px; font-weight: 800; letter-spacing: 1px; text-transform: uppercase; color: #8a8378; margin-top: 14px; }
+  .links { display: grid; gap: 14px; margin-top: 40px; }
+  .links a { display: flex; justify-content: space-between; align-items: center; gap: 16px; text-decoration: none; color: inherit; background: #fff; border: 2px solid #E2DDD4; border-radius: 20px; padding: 20px 22px; box-shadow: 0 4px 0 #E2DDD4; transition: transform .1s, box-shadow .1s; }
+  .links a:hover { transform: translateY(2px); box-shadow: 0 2px 0 #E2DDD4; }
+  .links b { font-size: 20px; font-weight: 900; display: block; }
+  .links span { font-size: 15px; color: #666; }
+  .links i { font-style: normal; font-size: 22px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="hero">
+    <img src="assets/ollie.jpg" alt="Ollie the otter">
+    <div>
+      <h1>Explore Your Block</h1>
+      <p class="sub">One neighborhood game that becomes the right game for whoever picks it up: a sticker hunt for kids, local history for teens, an outing planner for adults.</p>
+      <p class="meta">Build for Everyone · Google × k-ID · Games track</p>
+    </div>
+  </div>
+  <nav class="links">
+    <a href="prototype.html" style="background:#1F2030;color:#fff;border-color:#1F2030;box-shadow:0 4px 0 #000"><div><b>Clickable prototype</b><span style="color:rgba(255,255,255,.7)">Play as Mia (8), Leo (14), Lena (14, Germany) or Sam (32)</span></div><i>→</i></a>
+    <a href="kid-handoff.html"><div><b>k-ID handoff for the coders</b><span>Setup, permissions, our theme, which screen fills each k-ID state</span></div><i>→</i></a>
+    <a href="outline.html"><div><b>Project outline</b><span>The idea, who it changes for, screens, team plan, demo script</span></div><i>→</i></a>
+    <a href="styleboard.html"><div><b>Style board</b><span>Chalk + Plush: colors, type, buttons, stickers</span></div><i>→</i></a>
+    <a href="ollie.html"><div><b>Meet Ollie</b><span>The animated guide, plus kid vs teen/adult screens</span></div><i>→</i></a>
+  </nav>
+</main>
+</body>
+</html>

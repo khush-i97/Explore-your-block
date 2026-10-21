@@ -1,0 +1,19 @@
+/* App shell around the prototype screens (proto.css holds the screen styles). */
+.app { min-height: 100vh; display: grid; place-items: center; padding: 24px 16px; }
+.app .phone { position: relative; }
+.app .host .phone { margin: 0 auto; }
+
+/* our screens around k-ID's capture widget */
+.kid-capture { position: absolute; inset: 0; overflow-y: auto; background: var(--paper); padding: 56px 20px 24px; display: flex; flex-direction: column; gap: 14px; }
+.kid-capture .head { display: flex; align-items: center; gap: 12px; }
+.kid-capture .head ollie-otter { width: 74px; flex: none; }
+.kid-capture h2 { font-family: var(--display); font-stretch: 78%; font-weight: 800; font-size: 32px; line-height: .95; letter-spacing: -.4px; }
+.kid-capture .note { font-size: 12px; font-weight: 800; color: var(--ink-2); display: flex; gap: 6px; align-items: center; justify-content: center; }
+.stage-ollie { position: absolute; z-index: 2; left: 50%; top: 27%; width: 74%; transform: translateX(-50%); }
+.stage-ollie ollie-otter { width: 100%; display: block; }
+
+/* on a real phone, drop the fake device frame */
+@media (max-width: 480px) {
+  .app { padding: 0; place-items: stretch; }
+  .app .phone, .app .host .phone { width: 100vw !important; height: 100dvh !important; border: 0 !important; border-radius: 0 !important; box-shadow: none !important; }
+}
