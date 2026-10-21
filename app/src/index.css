@@ -22,6 +22,12 @@
 .demo-bar button[aria-selected=true] { background: var(--ink); color: #fff; }
 .demo-link { border: 0; background: none; cursor: pointer; font: 800 14px 'Nunito', system-ui, sans-serif; color: inherit; text-decoration: underline; text-underline-offset: 3px; opacity: .8; }
 
+/* Ask Ollie mic while recording / transcribing (src/voice.ts) */
+.chat-input .mic.rec { background: #E5484D; color: #fff; animation: mic-pulse 1.1s ease-in-out infinite; }
+.chat-input .mic.working { opacity: .55; pointer-events: none; }
+.chat-input input:disabled { background: none; }
+@keyframes mic-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(229,72,77,.45); } 50% { box-shadow: 0 0 0 9px rgba(229,72,77,0); } }
+
 /* on a real phone, drop the fake device frame */
 @media (max-width: 480px) {
   .shell { padding: 0; place-items: stretch; }

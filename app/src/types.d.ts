@@ -11,9 +11,8 @@ declare global {
       PLAYERS: Record<string, { id: string; name: string; age: number; country: string; countryName: string; band: Band; color: string }>
       RULES: Record<string, Record<string, RuleValue>>
       ollieAnswer: OllieAnswer
+      redact: (text: string) => { out: string; hid: string[] }
     }
-    // proto.js is a classic script, so its top-level functions are globals the screens call by name
-    ollieAnswer: OllieAnswer
   }
 }
 

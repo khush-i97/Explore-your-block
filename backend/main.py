@@ -2,20 +2,23 @@
 
 Run:  uvicorn main:app --reload --port 8000   (from this folder, inside its venv)
 
-Partner calls (k-ID claim, Inworld, Modulate, FastSpring checkout) aren't wired yet:
-those endpoints return mock answers so the front end works end to end.
+Wired: Gemini answers for Ask Ollie (/voice/ask, keyword answers as backup), Modulate speech-to-text
+(/voice/listen) and Inworld text-to-speech (/ollie/speak), when their keys are set. Not wired yet (mock answers): k-ID claim, photo check, FastSpring checkout.
 """
 import hashlib
 import hmac
 import base64
+import json
 import os
 import re
+from collections import OrderedDict
 from pathlib import Path
 from typing import Literal
 
+import httpx
 from dotenv import load_dotenv
-from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
-from pydantic import BaseModel
+from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, Response, UploadFile
+from pydantic import BaseModel, Field
 
 # keys live in app/.env (shared with the front end); only server-side names are read here
 load_dotenv(Path(__file__).resolve().parents[1] / "app" / ".env")
@@ -175,22 +178,137 @@ def group_spots(body: GroupIn):
     }
 
 
+class Turn(BaseModel):
+    from_: Literal["me", "ollie"] = Field(alias="from")
+    text: str
+
+
 class AskIn(BaseModel):
     text: str
     band: Band
     group: bool = False
     family: bool = False
+    history: list[Turn] = []  # the last few chat messages, so "Closer?" or "Cheaper?" make sense
+
+
+# what Ollie knows about each spot, for the model
+ABOUT = {
+    "md": "the old adobe mission chapel from 1791, the oldest building in San Francisco; history",
+    "park": "big sunny park with a hill and a skyline view; picnics, sunsets, hanging out",
+    "playground": "Helen Diller Playground in Dolores Park; slides and climbing for little kids",
+    "birite": "famous ice cream shop, cheap treat",
+    "tartine": "famous bakery: bread, pastries, coffee; bread sells out early",
+    "ritual": "specialty coffee roaster with tables to sit, read or study; cheap",
+    "roxie": "historic indie movie theater, matinees and late shows",
+    "foreign": "dinner restaurant with films in the courtyard; serves alcohol; date night",
+    "clarion": "alley covered in murals and street art; great for photos",
+}
+GEMINI_URL = "https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+WHO = {"teen": "a teenager (13 to 17)", "adult": "an adult"}
+
+
+def allowed_spots(band: Band, family: bool, group: bool) -> list[str]:
+    if family:
+        return FAMILY
+    if group:  # we don't know who's in the group here, so only spots that suit everyone
+        return [k for k in AGES if {"kid", "teen", "adult"} <= set(AGES[k])]
+    return [k for k in AGES if band in AGES[k]]
+
+
+async def gemini_answer(body: AskIn, text: str) -> tuple[list[str], str] | None:
+    """Ollie's answer from Gemini, limited to spots this person may go to. None means: use the keyword answer."""
+    key = os.getenv("GEMINI_API_KEY")
+    if not key or body.band == "kid":  # kids don't chat with Ollie
+        return None
+    spots = allowed_spots(body.band, body.family, body.group)
+    who = ("a parent planning a family outing with young kids" if body.family
+           else "a mixed group; follow the youngest person's rules" if body.group else WHO[body.band])
+    system = (
+        "You are Ollie, a cheerful otter who helps people plan outings in San Francisco's Mission District. "
+        f"You are talking to {who}. Reply in one or two short, warm sentences, like a friend. "
+        "Suggest 1 to 3 spots, chosen ONLY from this list (id: name, what it is):\n"
+        + "\n".join(f"{k}: {PLACES[k]['name']}, {ABOUT[k]}" for k in spots)
+        + "\nOnly name places from the list. If nothing fits, say so kindly and suggest the closest match. "
+        "If the question isn't about outings in the neighborhood, gently steer back to that. "
+        "Never ask for personal details like names, addresses or phone numbers."
+        + (" Never suggest anywhere that serves alcohol." if body.band != "adult" or body.family or body.group else "")
+    )
+    contents = [{"role": "user" if t.from_ == "me" else "model", "parts": [{"text": redact(t.text)[0]}]} for t in body.history[-6:]]
+    contents.append({"role": "user", "parts": [{"text": text}]})
+    payload = {
+        "systemInstruction": {"parts": [{"text": system}]},
+        "contents": contents,
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "responseSchema": {"type": "OBJECT", "required": ["reply", "spots"], "properties": {
+                "reply": {"type": "STRING"}, "spots": {"type": "ARRAY", "items": {"type": "STRING", "enum": spots}}}},
+            "temperature": 0.7, "maxOutputTokens": 300,
+        },
+    }
+    model = os.getenv("GEMINI_MODEL", "gemini-3.5-flash-lite")
+    try:
+        async with httpx.AsyncClient(timeout=8) as client:
+            r = await client.post(GEMINI_URL.format(model=model), headers={"x-goog-api-key": key}, json=payload)
+        r.raise_for_status()
+        out = json.loads(r.json()["candidates"][0]["content"]["parts"][0]["text"])
+    except (httpx.HTTPError, KeyError, IndexError, ValueError) as e:
+        print(f"[ask] Gemini failed ({e.__class__.__name__}: {str(e)[:120]}), using keyword answer")
+        return None
+    keys = [k for k in dict.fromkeys(out.get("spots", [])) if k in spots][:3]  # never trust the model's list
+    reply = str(out.get("reply", "")).strip()
+    return (keys, reply) if reply else None
 
 
 @api.post("/voice/ask")
-def voice_ask(body: AskIn):
-    # TODO(Modulate): accept multipart audio, transcribe, read emotion. Text works today.
+async def voice_ask(body: AskIn):
     clean, hidden = redact(body.text.strip())
     if not clean:
         raise HTTPException(400, "text is empty")
-    keys, reply = ollie_answer(body.text, body.band, body.family, body.group)
+    answer = await gemini_answer(body, clean)
+    source = "gemini" if answer else "keywords"
+    keys, reply = answer or ollie_answer(body.text, body.band, body.family, body.group)
     return {"transcript": clean, "redacted": hidden, "emotion": None, "reply": reply, "keys": keys,
-            "spots": [spot(k) for k in keys]}
+            "spots": [spot(k) for k in keys], "source": source}
+
+
+MODULATE_STT = "https://platform.modulate.ai/api/velma-2-stt-batch"
+AUDIO_EXT = {"audio/webm": "webm", "audio/ogg": "ogg", "audio/mp4": "mp4", "audio/mpeg": "mp3", "audio/wav": "wav", "audio/x-wav": "wav"}
+MAX_AUDIO = 10 * 1024 * 1024  # ~10 MB; a 15-second clip is far smaller
+
+
+@api.post("/voice/listen")
+async def voice_listen(audio: UploadFile = File(...), band: Band = Form(...)):
+    """Speech to text with Modulate. Kids never get the mic (k-ID: no voice chat under 13)."""
+    if band == "kid":
+        raise HTTPException(403, "Voice input is off for kids")
+    key = os.getenv("MODULATE_API_KEY")
+    if not key:
+        raise HTTPException(501, "MODULATE_API_KEY is not set")
+    data = await audio.read(MAX_AUDIO + 1)
+    if not data:
+        raise HTTPException(400, "empty recording")
+    if len(data) > MAX_AUDIO:
+        raise HTTPException(413, "recording is too long")
+    ext = AUDIO_EXT.get((audio.content_type or "").split(";")[0], "webm")
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            r = await client.post(MODULATE_STT, headers={"X-API-Key": key},
+                                  files={"upload_file": (f"voice.{ext}", data, audio.content_type or "audio/webm")},
+                                  data={"emotion_signal": "true", "speaker_diarization": "false"})
+    except httpx.HTTPError as e:
+        raise HTTPException(502, f"Modulate unreachable: {e.__class__.__name__}")
+    if r.status_code != 200:
+        raise HTTPException(502, f"Modulate error {r.status_code}")
+    out = r.json()
+    emotions = [u.get("emotion") for u in out.get("utterances", []) if u.get("emotion") not in (None, "Unknown")]
+    return {"text": out.get("text", "").strip(), "emotion": emotions[0] if emotions else None}
+
+
+INWORLD_TTS = "https://api.inworld.ai/tts/v1/voice"
+# Pick voices in Inworld's TTS Playground and set them in app/.env. A band without a voice falls back
+# to the browser's own voice in the app. Ollie doesn't speak to kids.
+VOICE_ENV = {"teen": "INWORLD_VOICE_TEEN", "adult": "INWORLD_VOICE_ADULT"}
+_speech_cache: OrderedDict[tuple[str, str, str], bytes] = OrderedDict()  # Ollie repeats lines; don't pay twice
 
 
 class SpeakIn(BaseModel):
@@ -200,9 +318,35 @@ class SpeakIn(BaseModel):
 
 
 @api.post("/ollie/speak")
-def ollie_speak(body: SpeakIn):
-    # TODO(Inworld): return audio/mpeg from Inworld TTS with Ollie's voice
-    return {"mock": True, "text": body.text}
+async def ollie_speak(body: SpeakIn):
+    """Text to Ollie's voice with Inworld. Returns audio/mpeg, or 501 so the app uses the browser's voice."""
+    if body.band == "kid":
+        raise HTTPException(403, "Ollie doesn't speak to kids")
+    key = os.getenv("INWORLD_API_KEY")
+    voice = os.getenv(VOICE_ENV[body.band])
+    if not key or not voice:
+        raise HTTPException(501, "Inworld voice not set up for this band")
+    text = body.text.strip()[:600]
+    if not text:
+        raise HTTPException(400, "text is empty")
+    model = os.getenv("INWORLD_MODEL", "inworld-tts-2")
+    cache_key = (voice, model, text)
+    if cache_key in _speech_cache:
+        _speech_cache.move_to_end(cache_key)
+        return Response(_speech_cache[cache_key], media_type="audio/mpeg")
+    try:
+        async with httpx.AsyncClient(timeout=30) as client:
+            r = await client.post(INWORLD_TTS, headers={"Authorization": f"Basic {key}"},
+                                  json={"text": text, "voiceId": voice, "modelId": model, "audioConfig": {"audioEncoding": "MP3"}})
+    except httpx.HTTPError as e:
+        raise HTTPException(502, f"Inworld unreachable: {e.__class__.__name__}")
+    if r.status_code != 200:
+        raise HTTPException(502, f"Inworld error {r.status_code}")
+    audio = base64.b64decode(r.json()["audioContent"])
+    _speech_cache[cache_key] = audio
+    if len(_speech_cache) > 200:
+        _speech_cache.popitem(last=False)
+    return Response(audio, media_type="audio/mpeg")
 
 
 @api.post("/photo/check")
