@@ -1,4 +1,6 @@
-# Explore Your Block: design notes
+# Ollie Ollie Out!: design notes
+
+App name: **Ollie Ollie Out!** (team: Explore your block). Mascot: Ollie the otter.
 
 One neighborhood outing app that reshapes for whoever is looking: kid spots for kids, hangouts for teens, a full planner for adults. For a mixed group, it shows only the spots that work for everyone, under the youngest person's k-ID rules.
 
@@ -70,6 +72,15 @@ Kid and teen spots never include places that sell alcohol. Anything we can't con
 
 "Walk there in Google Maps" and whole-route buttons use Google Maps direction links (no key). Embedding a real Google map needs a Maps JavaScript API key restricted to our domains.
 
+## Updates (21 Oct afternoon)
+
+- **Onboarding:** Ollie Ollie Out! splash → "Hi, I'm Ollie! Tell me your age" (swipe dial) → k-ID result → lock (kid none, teen PIN, adult Face ID/PIN) → teen/adult get a 4-card "What you can do" intro → home with a "Start here" 3-step checklist.
+- **Ask Ollie (typed AI chat):** teens and adults type what they want ("date night idea", "cheap eats"); Ollie answers with real spot cards → Add to my plan → Start or Google Maps. k-ID `ai-chat`: Lena (14, Germany) needs a parent's OK; kids have no free typing. Phone numbers and addresses are hidden. Teen answers never include places that sell alcohol. Ollie pops up above the chat box.
+- **Game loop for teens/adults:** gift drops at spots → spot challenge (photo challenge or true trivia) → 3 cards flip (sticker, story card, deal) → 12-sticker Mission District set on Finds. Rewards are earned, never bought.
+- **Ollie interactions:** hide-and-seek on the kid home ("Ollie Ollie Out!"), Ollie as your map marker, tap Ollie for a reaction, an Ollie helper button by the nav with tips.
+- **Look:** in-app screens follow the Alan app style (Figtree, white cards, labelled bottom nav + Ollie button). Brand accent = Ollie's bandana teal `#0F7C80`; no purple and no AI-looking sparkles/glows. Onboarding and big moments keep the bold Bricolage stage screens with a dome-shaped sheet.
+- **Map:** OpenFreeMap vector map restyled to white streets, green parks and blue water (no key). Embedding Google Maps needs a Maps JavaScript API key; "Walk there in Google Maps" links work now.
+
 ## Partners
 
 - **k-ID:** age, location, parent consent, every permission, and the group's strictest rules.
@@ -80,7 +91,7 @@ Kid and teen spots never include places that sell alcohol. Anything we can't con
 ## Design system (short)
 
 - Fonts: Bricolage Grotesque (headlines, condensed 78%) + Nunito (body).
-- Colors: ink `#1F2030`, paper `#F5F0E8`, chalk blue `#4C6FFF`, sunny yellow `#FFC83D`, mint `#22B88A`, hopscotch pink `#FF6F91`, Ollie fur `#C98552`.
+- Colors: ink `#1F2030`, paper `#F5F0E8`, cobalt `#1E7BD8`, Ollie teal `#0F7C80`, sunny yellow `#FFC83D`, mint `#22B88A`, hopscotch pink `#FF6F91`, Ollie fur `#C98552`.
 - Big moments use "stage" screens: a solid color, a dome, Ollie on top, one big word, one white button.
 - Ollie: `prototype/assets/ollie.js` (`<ollie-otter mood="idle|wave|search|cheer|sleep">`, plus `talking`).
 - Navigation: a floating bottom pill with 4 icons (Home, Map, Finds, Me).
