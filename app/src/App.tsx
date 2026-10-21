@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import {
   KidAskAnAdult, KidCollectAge, KidCoreProvider, KidSelectJurisdiction, KidSessionProvider,
   useKidAgeGate, useKidPermission, useKidSession, type KidDeclare,
@@ -44,9 +44,13 @@ const store = {
   set: (k: string, v: string) => { try { localStorage.setItem(k, v) } catch { /* private mode */ } },
   clear: () => { try { ['kid.sessionId', 'kid.challengeId', 'eyb.age'].forEach(k => localStorage.removeItem(k)) } catch { /* private mode */ } },
 }
+// every page load starts over at the splash (no resuming a saved session or age)
+store.clear()
 
 // ?j=US-CA or ?j=DE pins the country for a live demo; otherwise k-ID resolves it from the IP
 const jurisdiction = new URLSearchParams(location.search).get('j') || 'auto'
+const country = jurisdiction.startsWith('DE') ? 'DE' : 'US'
+const countryName = country === 'DE' ? 'Germany' : 'the US'
 
 const ageFrom = (signal: { age: number } | { dateOfBirth: string }) =>
   'age' in signal ? signal.age : Math.floor((Date.now() - Date.parse(signal.dateOfBirth)) / 3.15576e10)
@@ -74,13 +78,21 @@ function Stage({ bg, dome, ink = '#fff', kick, title, mood, children }: {
   )
 }
 
-function Welcome({ onStart }: { onStart: () => void }) {
-  return (
-    <Stage bg="#DDE6FF" dome="#4C6FFF" ink="#1F2030" mood="wave" title={<>Hi, I'm<br />Ollie!</>}>
-      <p>Let's explore your block together. Outings that fit you, and your whole group.</p>
-      <button className="btn-white" onClick={onStart}>Let's go <i className="ph-bold ph-arrow-right" /></button>
-    </Stage>
-  )
+/* ---------- the prototype's "Ollie Ollie Out!" splash and age dial; the dial's age goes to k-ID ---------- */
+function Intro({ onAge }: { onAge: (age: number) => void }) {
+  const host = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const EYB = window.EYB
+    if (!EYB || !host.current) return
+    // placeholder until k-ID answers: sets where the dial starts; nothing is allowed yet
+    EYB.PLAYERS.me = { id: 'me', name: 'You', age: 14, country, countryName, band: 'teen', color: '#4C6FFF' }
+    EYB.RULES.me = {}
+    host.current.innerHTML = ''
+    new EYB.Phone(host.current, 'me', { screen: 'splash', onAge })
+  }, [onAge])
+
+  return <div className="shell"><div className="host" ref={host} /></div>
 }
 
 /* ---------- k-ID capture: our header, k-ID's own pieces (they show only during their step) ---------- */
@@ -99,12 +111,12 @@ function Capture() {
 }
 
 /* ---------- the real app: k-ID permissions drive the prototype screens ---------- */
-function PassApp() {
+function PassApp({ dialAge }: { dialAge?: number }) {
   const { permissions } = useKidSession()
   const { can, get } = useKidPermission()
   const host = useRef<HTMLDivElement>(null)
 
-  const age = Number(store.get('eyb.age')) || 14 // no age asked (k-ID said none needed): treat as teen
+  const age = dialAge ?? (Number(store.get('eyb.age')) || 14) // no age asked (k-ID said none needed): treat as teen
   const band = age < 13 ? 'kid' : age < 18 ? 'teen' : 'adult'
   const rules = useMemo(() => {
     const rule = (name: PermName): Rule => can(name) ? 'yes' : get(name)?.managedBy === 'GUARDIAN' ? 'ask' : 'no'
@@ -125,11 +137,11 @@ function PassApp() {
   useEffect(() => {
     const EYB = window.EYB
     if (!EYB || !host.current) return
-    const country = jurisdiction.startsWith('DE') ? 'DE' : 'US'
-    EYB.PLAYERS.me = { id: 'me', name: 'You', age, country, countryName: country === 'DE' ? 'Germany' : 'the US', band, color: '#4C6FFF' }
+    EYB.PLAYERS.me = { id: 'me', name: 'You', age, country, countryName, band, color: '#4C6FFF' }
     EYB.RULES.me = rules
     host.current.innerHTML = ''
-    new EYB.Phone(host.current, 'me', { screen: 'home' })
+    // adults lock their profile with Face ID first (the prototype's lock screen), everyone else goes home
+    new EYB.Phone(host.current, 'me', { screen: band === 'adult' ? 'lock' : 'home' })
   }, [age, band, rules])
 
   return <div className="shell"><div className="host" ref={host} /></div>
@@ -169,9 +181,9 @@ function DemoApp() {
 }
 
 /* ---------- route by k-ID's status ---------- */
-function Flow({ onRetry, onDemo }: { onRetry: () => void; onDemo?: () => void }) {
+function Flow({ dialAge, onRetry, onDemo }: { dialAge?: number; onRetry: () => void; onDemo?: () => void }) {
   const { status } = useKidAgeGate()
-  if (status === 'pass') return <PassApp />
+  if (status === 'pass') return <PassApp dialAge={dialAge} />
   if (status === 'pending') return (
     <Stage bg="#262A52" dome="#363B70" kick="Hang tight" title={<>Waiting for<br />a grown-up</>} mood="sleep">
       <p>We emailed your grown-up. Ollie is napping until they say OK. This page updates by itself.</p>
@@ -199,8 +211,10 @@ function Flow({ onRetry, onDemo }: { onRetry: () => void; onDemo?: () => void })
 }
 
 export default function App() {
-  const [started, setStarted] = useState(Boolean(store.get('kid.sessionId')))
+  // the age from our dial; k-ID gets it as `age` and skips its own age input
+  const [age, setAge] = useState(() => Number(store.get('eyb.age')) || undefined)
   const [attempt, setAttempt] = useState(0)
+  const onAge = useCallback((a: number) => { store.set('eyb.age', String(a)); setAge(a) }, [])
   // ?demo skips k-ID and shows the prototype's players; only in `npm run dev`
   const [demo, setDemo] = useState(import.meta.env.DEV && new URLSearchParams(location.search).has('demo'))
   const openDemo = import.meta.env.DEV ? () => {
@@ -215,7 +229,7 @@ export default function App() {
       {openDemo && <button className="demo-link" onClick={openDemo}>Explore the demo without k-ID</button>}
     </Stage>
   )
-  if (!started) return <Welcome onStart={() => setStarted(true)} />
+  if (!age && !store.get('kid.sessionId')) return <Intro onAge={onAge} />
 
   const retry = () => { store.clear(); setAttempt(a => a + 1) } // remounting the provider is the reset
   return (
@@ -223,13 +237,14 @@ export default function App() {
       <KidSessionProvider
         key={attempt}
         jurisdiction={jurisdiction}
+        age={age ? { age } : undefined}
         sessionId={store.get('kid.sessionId')}
         challengeId={store.get('kid.challengeId')}
         onSession={(id) => store.set('kid.sessionId', id)}
         onChallenge={(id) => store.set('kid.challengeId', id)}
         onClaim={(claimToken) => { fetch('/api/kid/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim_token: claimToken }) }).catch(() => {}) }}
       >
-        <Flow onRetry={retry} onDemo={openDemo} />
+        <Flow dialAge={age} onRetry={retry} onDemo={openDemo} />
       </KidSessionProvider>
     </KidCoreProvider>
   )

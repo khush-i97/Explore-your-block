@@ -7,7 +7,7 @@ type OllieAnswer = (text: string, band: Band, ctx: { family?: boolean; group?: b
 declare global {
   interface Window {
     EYB?: {
-      Phone: { new (host: HTMLElement, playerId: string, opts?: { screen?: string; profiles?: string[] }): unknown; prototype: object }
+      Phone: { new (host: HTMLElement, playerId: string, opts?: { screen?: string; profiles?: string[]; onAge?: (age: number) => void }): unknown; prototype: object }
       PLAYERS: Record<string, { id: string; name: string; age: number; country: string; countryName: string; band: Band; color: string }>
       RULES: Record<string, Record<string, RuleValue>>
       ollieAnswer: OllieAnswer

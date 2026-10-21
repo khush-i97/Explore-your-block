@@ -245,6 +245,7 @@ class Phone {
     this.profiles = opts.profiles || [playerId];
     this.famStart = opts.family;
     this.outStart = opts.outside;
+    this.onAge = opts.onAge; // the React app hands the dial's age to the real k-ID check
     this.setPlayer(playerId, opts.screen || 'welcome');
   }
   chatSend(raw) {
@@ -957,6 +958,7 @@ class Phone {
   }
   act(a, el) {
     if (a === 'ageDone') {
+      if (this.onAge && !this.adding) return this.onAge(this.s.age);
       // k-ID decides the experience from the age + where you are; the demo maps it to a persona
       const band = this.s.age < 13 ? 'kid' : this.s.age < 18 ? 'teen' : 'adult';
       const target = band === 'kid' ? 'mia' : band === 'teen' ? (this.p.country === 'DE' ? 'lena' : 'leo') : 'sam';
