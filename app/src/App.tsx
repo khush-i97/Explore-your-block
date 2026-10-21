@@ -53,7 +53,7 @@ const ageFrom = (signal: { age: number } | { dateOfBirth: string }) =>
 
 /* ---------- a phone-shaped frame (full screen on a real phone) ---------- */
 function Frame({ children }: { children: ReactNode }) {
-  return <div className="app"><div className="phone"><div className="screen">{children}</div></div></div>
+  return <div className="shell"><div className="phone"><div className="screen">{children}</div></div></div>
 }
 
 /* ---------- one big bold stage screen, same classes as the prototype ---------- */
@@ -114,6 +114,7 @@ function PassApp() {
       buying: rule('in-game-purchases'),
       voice: rule('ai-voice-mode'),
       vchat: rule('voice-chat'),
+      ai: rule('ai-companion-chatbot'),
       location: band === 'kid' || rule('real-time-location-sharing') !== 'yes' ? 'zones' : 'yes',
       map: band === 'kid' ? 'no' : 'yes',
     } satisfies Record<string, Rule>
@@ -127,14 +128,48 @@ function PassApp() {
     const country = jurisdiction.startsWith('DE') ? 'DE' : 'US'
     EYB.PLAYERS.me = { id: 'me', name: 'You', age, country, countryName: country === 'DE' ? 'Germany' : 'the US', band, color: '#4C6FFF' }
     EYB.RULES.me = rules
+    host.current.innerHTML = ''
     new EYB.Phone(host.current, 'me', { screen: 'home' })
   }, [age, band, rules])
 
-  return <div className="app"><div className="host" ref={host} /></div>
+  return <div className="shell"><div className="host" ref={host} /></div>
+}
+
+/* ---------- local demo (dev only): the prototype's players, no k-ID ---------- */
+const DEMO = [
+  { id: 'mia', label: 'Mia, 8' },
+  { id: 'leo', label: 'Leo, 14' },
+  { id: 'lena', label: 'Lena, 14 · DE' },
+  { id: 'sam', label: 'Sam, 32' },
+  { id: 'family', label: 'Family phone' },
+]
+
+function DemoApp() {
+  const [who, setWho] = useState(() => new URLSearchParams(location.search).get('p') || 'sam')
+  const host = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const EYB = window.EYB
+    if (!EYB || !host.current) return
+    host.current.innerHTML = ''
+    if (who === 'family') new EYB.Phone(host.current, 'sam', { screen: 'profiles', profiles: ['mia', 'leo', 'sam'] })
+    else new EYB.Phone(host.current, EYB.PLAYERS[who] ? who : 'sam', { screen: 'splash' })
+  }, [who])
+
+  return (
+    <div className="shell demo">
+      <div className="demo-bar" role="tablist" aria-label="Who's playing">
+        {DEMO.map(d => (
+          <button key={d.id} role="tab" aria-selected={who === d.id} onClick={() => setWho(d.id)}>{d.label}</button>
+        ))}
+      </div>
+      <div className="host" ref={host} />
+    </div>
+  )
 }
 
 /* ---------- route by k-ID's status ---------- */
-function Flow({ onRetry }: { onRetry: () => void }) {
+function Flow({ onRetry, onDemo }: { onRetry: () => void; onDemo?: () => void }) {
   const { status } = useKidAgeGate()
   if (status === 'pass') return <PassApp />
   if (status === 'pending') return (
@@ -157,6 +192,7 @@ function Flow({ onRetry }: { onRetry: () => void }) {
     <Stage bg="#F3EEE6" dome="#1F2030" ink="#1F2030" kick="Hmm" title={<>Couldn't<br />reach k-ID</>} mood="idle">
       <p>Check your connection and try again.</p>
       <button className="btn-white" onClick={onRetry}>Try again</button>
+      {onDemo && <button className="demo-link" onClick={onDemo}>Explore the demo without k-ID</button>}
     </Stage>
   )
   return <Capture />
@@ -165,10 +201,18 @@ function Flow({ onRetry }: { onRetry: () => void }) {
 export default function App() {
   const [started, setStarted] = useState(Boolean(store.get('kid.sessionId')))
   const [attempt, setAttempt] = useState(0)
+  // ?demo skips k-ID and shows the prototype's players; only in `npm run dev`
+  const [demo, setDemo] = useState(import.meta.env.DEV && new URLSearchParams(location.search).has('demo'))
+  const openDemo = import.meta.env.DEV ? () => {
+    history.replaceState(null, '', '?demo')
+    setDemo(true)
+  } : undefined
 
+  if (demo) return <DemoApp />
   if (!PUBLISHABLE_KEY) return (
     <Stage bg="#F3EEE6" dome="#1F2030" ink="#1F2030" kick="Setup" title={<>Add the k-ID<br />key</>} mood="idle">
       <p>Set VITE_KID_PUBLISHABLE_KEY in .env.local (or in Vercel), then reload.</p>
+      {openDemo && <button className="demo-link" onClick={openDemo}>Explore the demo without k-ID</button>}
     </Stage>
   )
   if (!started) return <Welcome onStart={() => setStarted(true)} />
@@ -183,9 +227,9 @@ export default function App() {
         challengeId={store.get('kid.challengeId')}
         onSession={(id) => store.set('kid.sessionId', id)}
         onChallenge={(id) => store.set('kid.challengeId', id)}
-        onClaim={(claimToken) => { fetch('/api/kid/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claimToken }) }).catch(() => {}) }}
+        onClaim={(claimToken) => { fetch('/api/kid/claim', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ claim_token: claimToken }) }).catch(() => {}) }}
       >
-        <Flow onRetry={retry} />
+        <Flow onRetry={retry} onDemo={openDemo} />
       </KidSessionProvider>
     </KidCoreProvider>
   )

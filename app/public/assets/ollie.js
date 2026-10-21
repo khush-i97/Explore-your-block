@@ -131,18 +131,15 @@
   <svg class="fx" viewBox="0 0 328 400" aria-hidden="true">
     <g class="glass">
       <line x1="196" y1="262" x2="228" y2="306" stroke="#6B4A38" stroke-width="12" stroke-linecap="round"/>
-      <circle cx="176" cy="234" r="38" fill="#E4F6FA" fill-opacity=".35" stroke="#4C6FFF" stroke-width="10"/>
+      <circle cx="176" cy="234" r="38" fill="#E4F6FA" fill-opacity=".35" stroke="#1E7BD8" stroke-width="10"/>
       <path d="M156 222 a 22 22 0 0 1 18 -14" stroke="#fff" stroke-width="6" fill="none" stroke-linecap="round"/>
     </g>
     <g class="sparkles">
-      <path d="M34 70 l7 17 l17 7 l-17 7 l-7 17 l-7 -17 l-17 -7 l17 -7 z" fill="#FFC83D"/>
-      <path d="M290 54 l5 12 l12 5 l-12 5 l-5 12 l-5 -12 l-12 -5 l12 -5 z" fill="#FF6F91"/>
-      <path d="M300 170 l4 10 l10 4 l-10 4 l-4 10 l-4 -10 l-10 -4 l10 -4 z" fill="#22B88A"/>
-      <circle cx="40" cy="190" r="7" fill="#4C6FFF"/>
+      <circle cx="40" cy="190" r="7" fill="#1E7BD8"/>
       <circle cx="270" cy="16" r="5" fill="#FFC83D"/>
       <rect x="60" y="10" width="12" height="12" rx="3" fill="#22B88A" transform="rotate(20 66 16)"/>
     </g>
-    <g class="zzz" fill="#4C6FFF" font-family="'Bricolage Grotesque', 'Nunito', sans-serif" font-weight="800">
+    <g class="zzz" fill="#1E7BD8" font-family="'Bricolage Grotesque', 'Nunito', sans-serif" font-weight="800">
       <text x="262" y="60" font-size="34">z</text><text x="284" y="34" font-size="24">z</text>
     </g>
     <g class="hi" stroke="#FFC83D" stroke-width="7" stroke-linecap="round">
