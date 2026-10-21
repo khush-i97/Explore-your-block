@@ -1,14 +1,19 @@
 import type { DetailedHTMLProps, HTMLAttributes } from 'react'
 
 type RuleValue = 'yes' | 'ask' | 'no' | 'zones'
+type Band = 'kid' | 'teen' | 'adult'
+type OllieAnswer = (text: string, band: Band, ctx: { family?: boolean; group?: boolean }) => { keys: string[]; reply: string }
 
 declare global {
   interface Window {
     EYB?: {
-      Phone: new (host: HTMLElement, playerId: string, opts?: { screen?: string }) => unknown
-      PLAYERS: Record<string, { id: string; name: string; age: number; country: string; countryName: string; band: 'kid' | 'teen' | 'adult'; color: string }>
+      Phone: { new (host: HTMLElement, playerId: string, opts?: { screen?: string; profiles?: string[] }): unknown; prototype: object }
+      PLAYERS: Record<string, { id: string; name: string; age: number; country: string; countryName: string; band: Band; color: string }>
       RULES: Record<string, Record<string, RuleValue>>
+      ollieAnswer: OllieAnswer
     }
+    // proto.js is a classic script, so its top-level functions are globals the screens call by name
+    ollieAnswer: OllieAnswer
   }
 }
 
