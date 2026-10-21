@@ -7,11 +7,11 @@ const SPOTS: { id: string; name: string; ages: Band[] }[] = [
   { id: 'park', name: 'Dolores Park', ages: ['kid', 'teen', 'adult'] },
   { id: 'playground', name: 'Helen Diller Playground', ages: ['kid', 'adult'] },
   { id: 'birite', name: 'Bi-Rite Creamery', ages: ['kid', 'teen', 'adult'] },
-  { id: 'tartine', name: 'Tartine Bakery', ages: ['kid', 'teen', 'adult'] },
+  { id: 'tartine', name: 'Tartine Bakery', ages: ['adult'] },
   { id: 'md', name: 'Mission Dolores', ages: ['kid', 'teen', 'adult'] },
   { id: 'ritual', name: 'Ritual Coffee Roasters', ages: ['teen', 'adult'] },
   { id: 'clarion', name: 'Clarion Alley murals', ages: ['teen', 'adult'] },
-  { id: 'roxie', name: 'Roxie Theater', ages: ['teen', 'adult'] },
+  { id: 'roxie', name: 'Roxie Theater', ages: ['adult'] },
   { id: 'foreign', name: 'Foreign Cinema', ages: ['adult'] },
 ]
 const RULES: Record<Band, { locationSharing: boolean; chat: 'filtered' | 'moderate' | 'full'; buying: boolean }> = {

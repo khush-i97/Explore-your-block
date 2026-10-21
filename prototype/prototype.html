@@ -291,6 +291,26 @@
   @keyframes twinkle { 0%,100% { opacity: .15; } 50% { opacity: .9; } }
   .top-actions { position: absolute; z-index: 7; top: 44px; right: 14px; display: flex; gap: 6px; }
   .top-actions .chip { padding: 8px 12px; }
+  .top-actions .chip.icon { width: 38px; height: 38px; padding: 0; justify-content: center; font-size: 16px; }
+  .mode-sw { position: absolute; z-index: 7; top: 44px; left: 14px; display: flex; padding: 4px; border-radius: 999px; background: rgba(255,255,255,.94); backdrop-filter: blur(10px); box-shadow: var(--soft); }
+  .mode-sw button { position: relative; z-index: 1; border: 0; background: none; cursor: pointer; font: 900 12.5px 'Nunito'; padding: 8px 11px; border-radius: 999px; display: flex; gap: 5px; align-items: center; color: var(--ink-2); transition: color .3s; }
+  .mode-sw button[aria-selected=true] { color: #fff; }
+  .mode-sw .knob { position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px); border-radius: 999px; background: var(--ink); transition: transform .5s var(--spring), background .4s; }
+  .mode-sw.fam .knob { transform: translateX(100%); background: #FF8A4C; }
+  .screen.adult .family-sheet { background: #FFF4E6; }
+  .search { margin-top: 10px; display: flex; gap: 8px; align-items: center; background: #fff; border-radius: 16px; padding: 11px 14px; font-weight: 800; font-size: 14px; color: var(--ink-3); box-shadow: 0 2px 8px rgba(31,32,48,.05); }
+  .sugg { min-height: 34px; display: flex; gap: 6px; overflow-x: auto; margin: 8px -16px 0; padding: 0 16px 2px; scrollbar-width: none; }
+  .sugg .chip { background: #fff; color: var(--ink); flex: none; }
+  .hunt-cta { margin-top: 10px; width: 100%; border: 0; cursor: pointer; display: flex; gap: 12px; align-items: center; text-align: left; border-radius: 20px; padding: 12px 14px; color: #fff; font-family: inherit; background: radial-gradient(120% 140% at 20% 0%, #5FD8B0, #149872); box-shadow: 0 10px 22px rgba(34,184,138,.3); }
+  .hunt-cta b { display: block; font: 800 18px var(--display); font-stretch: 85%; } .hunt-cta small { font-size: 12px; font-weight: 700; opacity: .85; } .hunt-cta > i { margin-left: auto; font-size: 18px; }
+  .sticker-mini { width: 40px; height: 40px; border-radius: 50%; background: #fff; display: grid; place-items: center; color: #FFC83D; font-size: 20px; transform: rotate(-8deg); flex: none; }
+  .fam-setup { position: absolute; inset: 0; z-index: 12; background: rgba(20,20,30,.4); display: flex; align-items: flex-end; animation: fadeIn .25s ease; }
+  .fam-card { width: 100%; background: #FFF4E6; border-radius: 30px 30px 0 0; padding: 22px 20px 20px; animation: sheetUp .5s cubic-bezier(.2,.9,.25,1.08); }
+  .kid-ages { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
+  .kid-ages span { display: inline-flex; gap: 8px; align-items: center; background: #fff; border-radius: 999px; padding: 6px 6px 6px 14px; font-weight: 900; }
+  .kid-ages span button { border: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--soft-bg); cursor: pointer; }
+  .screen.fam-flip .leaf, .screen.fam-flip .sheet { animation: famFlip .6s var(--spring); }
+  @keyframes famFlip { 0% { transform: scale(.97); filter: saturate(.6); } 100% { transform: none; filter: none; } }
   .prof-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px 12px; margin-top: 22px; }
   .prof { border: 0; background: none; cursor: pointer; display: grid; justify-items: center; gap: 8px; font-family: inherit; }
   .prof .av { width: 96px; height: 96px; border-radius: 30px; display: grid; place-items: center; color: #fff; font: 800 38px var(--display); position: relative; box-shadow: 0 10px 22px rgba(31,32,48,.16); transition: transform .2s var(--spring); }
@@ -447,10 +467,15 @@ Object.assign(PLACES, {
   foreign: { name: 'Foreign Cinema', lat: 37.7564, lng: -122.4193, img: null, cat: 'Dinner', color: '#1F2030', icon: 'ph-fork-knife' },
 });
 // who each spot suits (k-ID band); group mode keeps only spots that suit everyone
-const AGES = { park: ['kid', 'teen', 'adult'], playground: ['kid', 'adult'], birite: ['kid', 'teen', 'adult'], tartine: ['kid', 'teen', 'adult'], md: ['kid', 'teen', 'adult'],
-  ritual: ['teen', 'adult'], clarion: ['teen', 'adult'], roxie: ['teen', 'adult'], foreign: ['adult'] };
-const FOR_BAND = { kid: ['playground', 'birite', 'park'], teen: ['park', 'ritual', 'clarion', 'roxie', 'birite'], adult: ['md', 'tartine', 'roxie', 'foreign'] };
+// kid + teen spots never include places that sell alcohol; anything we can't confirm stays adult-only
+const AGES = { park: ['kid', 'teen', 'adult'], playground: ['kid', 'adult'], birite: ['kid', 'teen', 'adult'], md: ['kid', 'teen', 'adult'],
+  ritual: ['teen', 'adult'], clarion: ['teen', 'adult'], tartine: ['adult'], roxie: ['adult'], foreign: ['adult'] };
+const FOR_BAND = { kid: ['playground', 'birite', 'park'], teen: ['park', 'ritual', 'clarion', 'birite'], adult: ['md', 'tartine', 'roxie', 'foreign'] };
 const BAND_ORDER = { kid: 0, teen: 1, adult: 2 };
+// Google Maps directions (no API key needed): one stop, or a walking route through several
+const gmapsDir = (keys) => { const pts = keys.map(k2 => `${PLACES[k2].lat},${PLACES[k2].lng}`); const dest = pts.pop();
+  return `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${dest}${pts.length ? `&waypoints=${encodeURIComponent(pts.join('|'))}` : ''}`; };
+const FAMILY = ['playground', 'birite', 'park', 'md'];
 const GROUP = ['mia', 'lena', 'sam'];
 const groupInfo = (ids) => {
   const youngest = ids.map(id => PLAYERS[id]).sort((a, b) => a.age - b.age)[0];
@@ -552,7 +577,14 @@ class Phone {
     this.roam = document.createElement('div'); this.roam.className = 'roam';
     this.roam.innerHTML = '<ollie-otter mood="idle"></ollie-otter>';
     this.profiles = opts.profiles || [playerId];
+    this.famStart = opts.family;
     this.setPlayer(playerId, opts.screen || 'welcome');
+  }
+  famFlip() {
+    this.render('none');
+    const scr = this.phoneEl.querySelector('.screen'); scr.classList.add('fam-flip');
+    this.ollie.setAttribute('mood', 'cheer'); setTimeout(() => this.ollie.setAttribute('mood', 'idle'), 1600);
+    this.confetti(); this.toast('Family mode on', 'ph-users-three');
   }
   enterProfile(id) {
     const keep = this.profiles; this.p = PLAYERS[id]; this.r = RULES[id];
@@ -564,6 +596,7 @@ class Phone {
   setPlayer(id, screen) {
     this.p = PLAYERS[id]; this.r = RULES[id];
     this.s = { found: 1, finds: 11, story: false, shareOk: this.r.sharing === 'yes', age: this.p.age };
+    if (this.famStart && this.adult) { this.s.family = true; this.s.kids = [5, 8]; }
     this.hist = []; this.navIdx = undefined; this.last = null;
     this.go(screen);
   }
@@ -595,7 +628,14 @@ class Phone {
     const b = (k, ic, label) => `<button class="${active === k ? 'on' : ''}" data-go="${k}" aria-label="${label}" title="${label}"><i class="${active === k ? 'ph-fill' : 'ph'} ${ic}"></i></button>`;
     return `<nav class="bnav" aria-label="Main"><span class="ind"></span>${b('home', 'ph-house', 'Home')}${b('map', 'ph-map-trifold', 'Map')}${b('finds', 'ph-seal-check', 'Finds')}${b('me', 'ph-user', 'Me')}</nav>`;
   }
-  topActions() {
+  modeSwitch() {
+    const fam = !!this.s.family;
+    return `<div class="mode-sw ${fam ? 'fam' : ''}" role="tablist" aria-label="Mode"><span class="knob"></span>
+      <button role="tab" aria-selected="${!fam}" data-act="${fam ? 'familyOff' : ''}"><i class="ph-fill ph-user"></i>Just me</button>
+      <button role="tab" aria-selected="${fam}" data-act="${fam ? '' : 'familyOn'}"><i class="ph-fill ph-users-three"></i>Family</button></div>`;
+  }
+  topActions(compact) {
+    if (compact) return `<div class="top-actions"><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup" aria-label="Going with others"><i class="ph-bold ph-users-three"></i></button><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
     return `<div class="top-actions"><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup"><i class="ph-bold ph-users-three"></i>Going with others?</button><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
   }
   spotCard(key, extra = '') {
@@ -611,7 +651,8 @@ class Phone {
 
   /* ---------- screens ---------- */
   screens() {
-    const p = this.p, r = this.r, s = this.s, k = this.kid, adult = this.adult;
+    const p = this.p, r = this.r, s = this.s, adult = this.adult;
+    const k = this.kid || (s.familyHunt && ['task', 'quiz', 'celebrate', 'finds'].includes(this.screen));
     const H = PLACES.hydrant, MD = PLACES.md;
     const here = adult ? MD : PLACES.park;
     return {
@@ -752,16 +793,27 @@ class Phone {
           <div class="grow"></div>
           <button class="btn btn-kid blue nudge" data-go="task">Next: ${HUNT[Math.min(s.found, 4)].name.toLowerCase()} at ${HUNT[Math.min(s.found, 4)].at}</button>
         </div>`
-      : adult ? `
+      : adult ? (s.family ? `
+        <div class="leaf" style="height:340px" data-map="near" data-keys="${FAMILY.join(',')}"></div>${this.status()}
+        <div class="sheet family-sheet" style="top:300px;padding:18px 16px 16px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">
+            <div><p class="eyebrow">Family mode · with ${s.kids.length} kid${s.kids.length === 1 ? '' : 's'} (${s.kids.join(' & ')})</p><h2 class="disp h-l" style="margin-top:3px">Family day out</h2></div>
+            <div style="display:flex;gap:6px"><a class="btn btn-pill light sm" style="text-decoration:none;padding:11px 12px;background:#fff" href="${gmapsDir(['playground', 'birite', 'park'])}" target="_blank" rel="noopener" aria-label="Open route in Google Maps"><i class="ph-fill ph-google-logo"></i></a><button class="btn btn-pill sm" data-act="familyHunt">Start</button></div>
+          </div>
+          <div class="search"><i class="ph-bold ph-magnifying-glass"></i>Search family-friendly…</div>
+          <div class="sugg">${['Playgrounds nearby', 'Ice cream', 'Easy walks', 'Rainy day ideas'].map(t => `<span class="chip">${t}</span>`).join('')}</div>
+          <div class="stack" style="margin-top:2px">${['playground', 'birite', 'park'].map((k2, i) => this.spotCard(k2, `<span class="pill-st ${i === 0 ? 'here' : ''}">${i === 0 ? 'Here now' : i + 1}</span>`)).join('')}</div>
+          <button class="hunt-cta" data-act="familyHunt"><span class="sticker-mini"><i class="ph-fill ph-star"></i></span><div><b>Start Ollie's sticker hunt</b><small>The kids find things at each stop</small></div><i class="ph-bold ph-caret-right"></i></button>
+        </div>${this.modeSwitch()}${this.topActions(true)}${this.vnav('home')}` : `
         <div class="leaf" style="height:370px" data-map="walk"></div>${this.status()}
         <div class="sheet" style="top:330px;padding:18px 16px 16px">
           <div style="display:flex;justify-content:space-between;align-items:flex-end;gap:10px">
             <div><p class="eyebrow">Tonight · 4 stops · about 1 mi</p><h2 class="disp h-l" style="margin-top:3px">Your Mission evening</h2></div>
-            <button class="btn btn-pill sm" data-go="task">Start</button>
+            <div style="display:flex;gap:6px"><a class="btn btn-pill light sm" style="text-decoration:none;padding:11px 12px" href="${gmapsDir(WALK)}" target="_blank" rel="noopener" aria-label="Open route in Google Maps"><i class="ph-fill ph-google-logo"></i></a><button class="btn btn-pill sm" data-go="task">Start</button></div>
           </div>
           <div class="stack" style="margin-top:4px">${WALK.map((key, i) => { const pl = PLACES[key];
             return `<div class="pcard"><div class="th" style="${pl.img ? `background-image:url(${pl.img})` : `background:${pl.color}`}">${pl.img ? '' : `<i class="ph-fill ${pl.icon}"></i>`}</div><div style="flex:1"><b>${pl.name}</b><small>${WALK_SUB[i]}</small></div>${i === 0 ? '<span class="pill-st here">Here now</span>' : `<span class="pill-st">${i + 1}</span>`}</div>`; }).join('')}</div>
-        </div>${this.topActions()}${this.vnav('home')}${this.arrive('md', 'Check in')}`
+        </div>${this.modeSwitch()}${this.topActions(true)}${this.vnav('home')}${this.arrive('md', 'Check in')}`)
       : `
         <div class="scenebox dusk" style="height:320px">${scene('dusk')}</div>${this.status(true)}
         <div style="position:absolute;z-index:6;top:86px;left:20px;color:#fff"><small style="font-size:12.5px;font-weight:800;opacity:.8">Good evening, ${p.name}</small><h2 class="disp h-l" style="text-shadow:0 2px 12px rgba(0,0,0,.25)">Mission St</h2></div>
@@ -789,6 +841,7 @@ class Phone {
           <p class="p">${adult ? 'The small white chapel next to the basilica is the original mission. Check in with a photo to log stop 1 and keep your walk going.' : 'Climb to the top of the park for the best view of downtown. Snap it to add the spot to your map and unlock 3 more hangouts nearby.'}</p>
           <div class="card-soft" style="margin-top:12px;display:flex;gap:10px;align-items:center"><i class="ph-fill ph-check-circle" style="color:var(--mint);font-size:22px"></i><div><b style="font-size:14px">You're here</b><br><small style="color:var(--ink-2);font-size:12px;font-weight:700">Inside the ${adult ? 'Mission Dolores' : 'landmark'} zone</small></div></div>
           <div class="grow"></div>
+          <a class="btn btn-pill light full" style="text-decoration:none;margin-bottom:8px" href="${gmapsDir([adult ? 'md' : 'park'])}" target="_blank" rel="noopener"><i class="ph-fill ph-google-logo"></i>Walk there in Google Maps</a>
           <button class="btn btn-pill full" data-go="camera"><i class="ph-fill ph-camera"></i>${adult ? 'Check in with a photo' : 'Snap to unlock'}</button>
         </div>`,
 
@@ -827,7 +880,7 @@ class Phone {
             <p class="eyebrow">AI check · it's a match</p>
             <h2 class="disp h-l" style="margin-top:4px">Spot unlocked</h2>
             <p class="p">Top of Dolores Park is on your map. 3 more hangouts just opened nearby.</p>
-            <div class="stack">${this.spotCard('ritual')}${this.spotCard('roxie')}</div>
+            <div class="stack">${this.spotCard('ritual')}${this.spotCard('birite')}</div>
             <div style="margin-top:12px"><div style="display:flex;justify-content:space-between;font-size:13px;font-weight:800"><span>Local Explorer badge</span><span>4 of 5</span></div><div class="progress"><i style="width:0" data-w="80%"></i></div></div>`}
           <div class="grow"></div>
           <div style="display:flex;gap:10px">
@@ -850,15 +903,15 @@ class Phone {
             <div><b style="font-size:14px">Following ${y.name}'s rules (${y.age}, ${y.country})</b><br><small style="font-size:12px;font-weight:700;opacity:.75">k-ID: location sharing off · chat filtered · no buying for kids</small></div>
           </div>
           <div class="stack">${g.spots.map(k2 => this.spotCard(k2, '<span class="pill-st here">All 3</span>')).join('')}</div>
-          <button class="btn btn-pill full" style="margin-top:12px" data-go="ask"><i class="ph-fill ph-microphone"></i>"What can we all do?"</button>
+          <div style="display:flex;gap:8px;margin-top:12px"><button class="btn btn-pill" style="flex:1" data-go="ask"><i class="ph-fill ph-microphone"></i>"What can we all do?"</button><a class="btn btn-pill light" style="text-decoration:none;background:#fff" href="${gmapsDir(g.spots)}" target="_blank" rel="noopener" aria-label="Route in Google Maps"><i class="ph-fill ph-google-logo"></i></a></div>
           ${r.buying !== 'no' ? `<div class="deal-locked" style="margin-top:10px;cursor:pointer" data-go="pack"><span class="shine"></span><div class="lk"><i class="ph-fill ph-gift"></i></div><div><b>Family Outing Pack</b><small>${r.buying === 'yes' ? '5 guided outings for the whole group · FastSpring' : 'Ask a parent to unlock · FastSpring'}</small></div><i class="ph-bold ph-caret-right" style="margin-left:auto"></i></div>` : ''}
         </div>`; },
 
       ask: () => { const grp = this.groupMode;
         const reply = grp ? "Dolores Park! There's a playground for Mia, the hill for Lena, and Bi-Rite ice cream for everyone."
           : adult ? "Start at Mission Dolores, grab bread at Tartine, then catch a movie at the Roxie."
-          : "Ritual's close for a coffee, or head to the top of Dolores Park for the sunset view.";
-        const chips = grp ? ['park', 'playground', 'birite'] : adult ? ['md', 'tartine', 'roxie'] : ['ritual', 'park'];
+          : "Ritual's close for a coffee, or grab ice cream at Bi-Rite and head up the park for the sunset.";
+        const chips = grp ? ['park', 'playground', 'birite'] : adult ? ['md', 'tartine', 'roxie'] : ['ritual', 'birite', 'park'];
         return `${this.status(true)}${stageScreen({ bg: '#1F2030', dome: '#2B2E4A', kick: s.askDone ? 'Ollie · Inworld voice' : 'Listening · Modulate',
           title: `"What can ${grp ? 'we all' : 'I'} do<br>nearby?"`,
           bottom: s.askDone
@@ -1081,6 +1134,27 @@ class Phone {
     }
     if (a === 'addGo') { this.adding = true; this.go('age'); }
     if (a === 'say') this.say();
+    if (a === 'familyOn') {
+      if (this.s.kids) { this.s.family = true; this.famFlip(); return; }
+      const sh = document.createElement('div'); sh.className = 'fam-setup';
+      this.s.kidsDraft = [5, 8];
+      const draw = () => sh.innerHTML = `<div class="fam-card"><p class="eyebrow">Family mode</p><h2 class="disp h-l" style="margin-top:4px">Who's with you?</h2>
+        <p class="p">Add the kids' ages. No accounts for them, nothing about them leaves your phone.</p>
+        <div class="kid-ages">${this.s.kidsDraft.map((ag, i) => `<span>Kid, ${ag}<button data-x="${i}" aria-label="Remove"><i class="ph-bold ph-x"></i></button></span>`).join('')}<span style="padding:6px 6px 6px 12px;background:transparent;box-shadow:inset 0 0 0 2px #E9DCC8">Add<button data-add="1" aria-label="Add a kid"><i class="ph-bold ph-plus"></i></button></span></div>
+        <button class="btn btn-pill full" style="margin-top:18px" data-start="1"><i class="ph-fill ph-users-three"></i>Start family mode</button>
+        <button class="link" style="width:100%" data-cancel="1">Not now</button></div>`;
+      draw();
+      sh.addEventListener('click', (e) => {
+        const t = e.target.closest('button'); if (!t) return; e.stopPropagation();
+        if (t.dataset.x) { this.s.kidsDraft.splice(+t.dataset.x, 1); draw(); }
+        if (t.dataset.add) { this.s.kidsDraft.push([3, 6, 10, 11][this.s.kidsDraft.length % 4]); draw(); }
+        if (t.dataset.cancel) sh.remove();
+        if (t.dataset.start) { this.s.kids = this.s.kidsDraft.length ? this.s.kidsDraft : [6]; this.s.family = true; sh.remove(); this.famFlip(); }
+      });
+      this.phoneEl.querySelector('.screen').appendChild(sh);
+    }
+    if (a === 'familyOff') { this.s.family = false; this.s.familyHunt = false; this.render('none'); this.toast('Back to just you', 'ph-user'); }
+    if (a === 'familyHunt') { this.s.familyHunt = true; this.go('task'); }
     if (a === 'startGroup') { this.groupMode = true; this.go('group'); this.toast('Mia, Lena and Sam are in', 'ph-users-three'); }
     if (a === 'askDone') { this.s.askDone = true; this.render('none'); this.ollie.setAttribute('mood', 'wave'); setTimeout(() => this.ollie.say && this.ollie.say(3200), 60); }
     if (a === 'checkout') {
@@ -1161,7 +1235,7 @@ function mount(screen) {
   document.getElementById('cmp').setAttribute('aria-pressed', compare);
   const ids = compare ? ['mia', 'lena', 'sam'] : [current];
   stage.innerHTML = ids.map(id => `<div class="phone-col">${compare ? `<span class="who">${PLAYERS[id].name}, ${PLAYERS[id].age} · ${PLAYERS[id].country}</span>` : ''}<div class="host"></div></div>`).join('');
-  [...stage.querySelectorAll('.host')].forEach((h, i) => new Phone(h, ids[i], { screen: screen || (compare ? 'home' : 'welcome') }));
+  [...stage.querySelectorAll('.host')].forEach((h, i) => new Phone(h, ids[i], { screen: screen || (compare ? 'home' : 'welcome'), family: q.get('fam') }));
   renderConsole();
 }
 const q = new URLSearchParams(location.search);
