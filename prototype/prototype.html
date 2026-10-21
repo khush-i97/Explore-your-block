@@ -335,6 +335,21 @@
   .kcheck { display: grid; gap: 8px; margin-top: 14px; width: 100%; }
   .kcheck div { color: var(--ink); display: flex; gap: 10px; align-items: center; background: var(--soft-bg); border-radius: 16px; padding: 12px 14px; font-weight: 800; font-size: 14px; opacity: 0; animation: fadeUp .45s var(--spring) both; }
   .kcheck i { font-size: 20px; color: var(--mint); }
+  .bingo { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-top: 12px; }
+  .bcell { position: relative; border: 0; cursor: pointer; border-radius: 18px; background: var(--soft-bg); padding: 10px 6px 8px; display: grid; justify-items: center; gap: 4px; font-family: inherit; }
+  .bcell i { font-size: 30px; color: var(--c); } .bcell small { font-size: 10.5px; font-weight: 800; color: var(--ink-2); line-height: 1.15; }
+  .bcell.got { background: color-mix(in srgb, var(--c) 18%, #fff); }
+  .bcell .tick { position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: var(--mint); color: #fff; display: grid; place-items: center; font-size: 13px; border: 3px solid #fff; animation: starPop .4s var(--spring); }
+  .stop.door { cursor: pointer; } .stop.door span { background: #22B88A; position: relative; } .stop.door span:after { content: ''; position: absolute; right: -4px; bottom: -4px; width: 20px; height: 20px; border-radius: 50%; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath fill='%231F2030' d='M208 80h-32V56a48 48 0 0 0-96 0v24H48a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h160a16 16 0 0 0 16-16V96a16 16 0 0 0-16-16ZM96 56a32 32 0 0 1 64 0v24H96Z'/%3E%3C/svg%3E") center/12px no-repeat; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+  .deal-row { display: flex; gap: 8px; } .deal-row span { background: rgba(255,255,255,.14); border-radius: 16px; padding: 8px 10px; font-weight: 900; font-size: 13px; display: grid; justify-items: center; gap: 2px; }
+  .deal-row span i { font-size: 20px; } .deal-row small { font-size: 10px; font-weight: 700; opacity: .8; }
+  .pass-cta { margin-top: 10px; width: 100%; border: 0; cursor: pointer; display: flex; gap: 12px; align-items: center; text-align: left; border-radius: 20px; padding: 12px 14px; color: #fff; font-family: inherit; background: radial-gradient(120% 140% at 20% 0%, #8467E8, #4E2FC0); box-shadow: 0 10px 22px rgba(108,75,216,.3); }
+  .pass-cta > span { width: 40px; height: 40px; border-radius: 14px; background: rgba(255,255,255,.18); display: grid; place-items: center; font-size: 20px; flex: none; }
+  .pass-cta b { display: block; font: 800 18px var(--display); font-stretch: 85%; } .pass-cta small { font-size: 12px; font-weight: 700; opacity: .85; } .pass-cta > i { margin-left: auto; }
+  .qr-card { display: flex; gap: 14px; align-items: center; background: #fff; border-radius: 22px; padding: 14px; margin-top: 12px; box-shadow: var(--soft); }
+  .qr { width: 84px; height: 84px; display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; padding: 6px; background: #fff; border-radius: 10px; box-shadow: inset 0 0 0 2px var(--line); flex: none; }
+  .qr i { background: var(--ink); border-radius: 2px; }
+  .qr-card b { display: block; font-weight: 900; } .qr-card small { font-size: 12px; color: var(--ink-2); font-weight: 700; }
   .fs-sheet { position: absolute; inset: 0; z-index: 12; background: rgba(20,20,30,.45); display: flex; align-items: flex-end; animation: fadeIn .25s ease; }
   .fs-card { width: 100%; background: #fff; border-radius: 28px 28px 0 0; padding: 20px; animation: sheetUp .45s cubic-bezier(.2,.9,.25,1.08); }
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -472,6 +487,33 @@ const AGES = { park: ['kid', 'teen', 'adult'], playground: ['kid', 'adult'], bir
   ritual: ['teen', 'adult'], clarion: ['teen', 'adult'], tartine: ['adult'], roxie: ['adult'], foreign: ['adult'] };
 const FOR_BAND = { kid: ['playground', 'birite', 'park'], teen: ['park', 'ritual', 'clarion', 'birite'], adult: ['md', 'tartine', 'roxie', 'foreign'] };
 const BAND_ORDER = { kid: 0, teen: 1, adult: 2 };
+const INSIDE = [
+  { id: 'color', label: 'Color hunt', icon: 'ph-palette', color: '#E5484D', where: 'In your room', title: 'Find something red!', hint: ['#E5484D', '#FF8A80', '#B71C1C'],
+    quiz: [['ph-apple-logo', 'An apple'], ['ph-book', 'A book'], ['ph-sneaker', 'A shoe'], ['ph-car-profile', 'A toy car']] },
+  { id: 'shape', label: 'Shape safari', icon: 'ph-circle', color: '#4C6FFF', where: 'In the kitchen', title: 'Find something round!', shapes: ['ph-circle', 'ph-circle-half', 'ph-record'],
+    quiz: [['ph-clock', 'A clock'], ['ph-cookie', 'A cookie'], ['ph-basketball', 'A ball'], ['ph-coin', 'A coin']] },
+  { id: 'riddle', label: "Ollie's riddle", icon: 'ph-question', color: '#FFC83D', where: "Ollie's riddle", title: '"I\'m soft, and you<br>sleep on me!"', riddle: true,
+    quiz: [['ph-bed', 'A pillow', true], ['ph-fork-knife', 'A fork'], ['ph-sneaker', 'A shoe'], ['ph-coffee', 'A cup']] },
+];
+const BINGO = [['ph-bird', 'A bird in a tree', '#4C6FFF'], ['ph-flower', 'A yellow flower', '#FFC83D'], ['ph-leaf', 'A leaf bigger than your hand', '#22B88A'],
+  ['ph-cloud', 'A cloud shaped like an animal', '#7FB6E8'], ['ph-dog', 'A dog on a walk', '#C98552'], ['ph-butterfly', 'A butterfly', '#FF6F91']];
+// made-up partner shops for the demo (no real business has signed up)
+const PARTNERS = [
+  { id: 'boba', name: 'Mission Boba', deal: '20% off', cat: 'Boba', icon: 'ph-bubble', color: '#B388FF', lat: 37.7598, lng: -122.4213, teen: true },
+  { id: 'comics', name: 'Lucky Comics', deal: '10% off', cat: 'Comics', icon: 'ph-book-open-text', color: '#FF6F91', lat: 37.7618, lng: -122.4219, teen: true },
+  { id: 'arcade', name: 'Pixel Pit Arcade', deal: '2 free tokens', cat: 'Arcade', icon: 'ph-game-controller', color: '#4C6FFF', lat: 37.7577, lng: -122.4199, teen: true },
+  { id: 'coffee', name: 'Sunday Coffee Co.', deal: '15% off', cat: 'Coffee', icon: 'ph-coffee', color: '#8A5638', lat: 37.7606, lng: -122.4222, teen: true },
+  { id: 'vinyl', name: 'Valencia Vinyl', deal: '10% off', cat: 'Records', icon: 'ph-vinyl-record', color: '#1F2030', lat: 37.7589, lng: -122.4216, teen: false },
+];
+const passPartners = (teen) => PARTNERS.filter(x => teen ? x.teen : true);
+// the cozy inside-the-house scene for kids
+const house = () => `<svg viewBox="0 0 320 330" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+  <rect width="320" height="330" fill="#FFE9D6"/><rect y="250" width="320" height="80" fill="#E8C9A6"/><rect y="246" width="320" height="6" fill="#D9B48C"/>
+  <rect x="190" y="70" width="104" height="110" rx="10" fill="#fff"/><rect x="198" y="78" width="88" height="94" rx="6" fill="#BFE3FF"/><circle cx="262" cy="104" r="12" fill="#FFE08A"/><ellipse cx="226" cy="140" rx="20" ry="7" fill="#fff"/><rect x="240" y="78" width="4" height="94" fill="#fff"/><rect x="198" y="123" width="88" height="4" fill="#fff"/>
+  <rect x="24" y="96" width="96" height="8" rx="3" fill="#C98552"/><rect x="30" y="66" width="12" height="30" rx="2" fill="#FF6F91"/><rect x="44" y="72" width="10" height="24" rx="2" fill="#4C6FFF"/><rect x="56" y="62" width="14" height="34" rx="2" fill="#22B88A"/><circle cx="98" cy="84" r="12" fill="#FFC83D"/>
+  <rect x="24" y="150" width="96" height="8" rx="3" fill="#C98552"/><path d="M40 150 q 10 -30 24 0 z" fill="#5FBF7F"/><rect x="46" y="140" width="12" height="10" fill="#E8663D"/><rect x="80" y="122" width="26" height="28" rx="4" fill="#fff"/><path d="M84 142 l7 -9 l6 7 l4 -4 l5 6 z" fill="#9FE0C8"/>
+  <ellipse cx="160" cy="292" rx="120" ry="22" fill="#FF8FA8" opacity=".55"/><ellipse cx="160" cy="292" rx="84" ry="14" fill="#FFB4C4" opacity=".7"/>
+</svg>`;
 // Google Maps directions (no API key needed): one stop, or a walking route through several
 const gmapsDir = (keys) => { const pts = keys.map(k2 => `${PLACES[k2].lat},${PLACES[k2].lng}`); const dest = pts.pop();
   return `https://www.google.com/maps/dir/?api=1&travelmode=walking&destination=${dest}${pts.length ? `&waypoints=${encodeURIComponent(pts.join('|'))}` : ''}`; };
@@ -548,6 +590,8 @@ function spot(screen, band, navSide) {
     parent:   { x: 50, y: 14, w: 40, mood: 'idle', hide: true },
     approved: { x: 50, y: 26, w: 76, mood: 'cheer' },
     prohibited: { x: 50, y: 28, w: 72, mood: 'wave' },
+    askOutside: { x: 50, y: 27, w: 72, mood: 'wave' },
+    pass:     { x: 50, y: 26, w: 70, mood: 'cheer' },
     group:    { x: 84, y: 26, w: 26, mood: 'wave' },
     ask:      { x: 50, y: 27, w: 74, mood: 'idle', talk: true },
     pack:     { x: 50, y: 26, w: 72, mood: 'cheer' },
@@ -578,6 +622,7 @@ class Phone {
     this.roam.innerHTML = '<ollie-otter mood="idle"></ollie-otter>';
     this.profiles = opts.profiles || [playerId];
     this.famStart = opts.family;
+    this.outStart = opts.outside;
     this.setPlayer(playerId, opts.screen || 'welcome');
   }
   famFlip() {
@@ -588,15 +633,16 @@ class Phone {
   }
   enterProfile(id) {
     const keep = this.profiles; this.p = PLAYERS[id]; this.r = RULES[id];
-    this.s = { found: 1, finds: 11, story: false, shareOk: this.r.sharing === 'yes', age: this.p.age };
+    this.s = { found: 1, finds: 11, story: false, shareOk: this.r.sharing === 'yes', age: this.p.age, game: 0, bingo: {} };
     this.profiles = keep; this.hist = ['profiles']; this.navIdx = undefined;
     this.go('home'); this.toast(`Hi ${this.p.name}!`, 'ph-hand-waving');
   }
   lockOf(id) { const b = PLAYERS[id].band; return b === 'kid' ? 'none' : b === 'teen' ? 'pin' : 'face'; }
   setPlayer(id, screen) {
     this.p = PLAYERS[id]; this.r = RULES[id];
-    this.s = { found: 1, finds: 11, story: false, shareOk: this.r.sharing === 'yes', age: this.p.age };
+    this.s = { found: 1, finds: 11, story: false, shareOk: this.r.sharing === 'yes', age: this.p.age, game: 0, bingo: {} };
     if (this.famStart && this.adult) { this.s.family = true; this.s.kids = [5, 8]; }
+    if (this.outStart && this.kid) this.s.outside = true;
     this.hist = []; this.navIdx = undefined; this.last = null;
     this.go(screen);
   }
@@ -623,6 +669,11 @@ class Phone {
     this.phoneEl.appendChild(box); setTimeout(() => box.remove(), 3000);
   }
   status(light) { return `<div class="status ${light ? 'light' : ''}"><span>9:41</span><span><i class="ph-fill ph-cell-signal-full"></i> <i class="ph-fill ph-battery-high"></i></span></div>`; }
+  curGame() {
+    const s = this.s;
+    if (s.outside || s.familyHunt) { const i = s.bingoNow ?? 0; const b = BINGO[i]; return { id: 'bingo', label: 'Nature bingo', icon: b[0], color: b[2], where: 'Outside · play zone', title: `Find ${b[1].toLowerCase()}!`, bingo: true }; }
+    return INSIDE[Math.min(s.game || 0, INSIDE.length - 1)];
+  }
   kidStars() { return `<div class="kid-stars">${HUNT.map((h, i) => i < this.s.found ? `<i style="background:${h.color}"><span class="ph-fill ${h.icon}"></span></i>` : `<i class="empty"></i>`).join('')}</div>`; }
   vnav(active) {
     const b = (k, ic, label) => `<button class="${active === k ? 'on' : ''}" data-go="${k}" aria-label="${label}" title="${label}"><i class="${active === k ? 'ph-fill' : 'ph'} ${ic}"></i></button>`;
@@ -635,8 +686,8 @@ class Phone {
       <button role="tab" aria-selected="${fam}" data-act="${fam ? '' : 'familyOn'}"><i class="ph-fill ph-users-three"></i>Family</button></div>`;
   }
   topActions(compact) {
-    if (compact) return `<div class="top-actions"><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup" aria-label="Going with others"><i class="ph-bold ph-users-three"></i></button><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
-    return `<div class="top-actions"><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup"><i class="ph-bold ph-users-three"></i>Going with others?</button><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
+    if (compact) return `<div class="top-actions"><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="pass" aria-label="Local deals"><i class="ph-fill ph-ticket"></i></button><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup" aria-label="Going with others"><i class="ph-bold ph-users-three"></i></button><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
+    return `<div class="top-actions"><button class="chip glass icon" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="pass" aria-label="Local deals"><i class="ph-fill ph-ticket"></i></button><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-act="startGroup"><i class="ph-bold ph-users-three"></i>Going with others?</button><button class="chip glass" style="border:0;cursor:pointer;box-shadow:var(--soft)" data-go="ask" aria-label="Ask Ollie"><i class="ph-fill ph-microphone"></i></button></div>`;
   }
   spotCard(key, extra = '') {
     const pl = PLACES[key];
@@ -688,15 +739,15 @@ class Phone {
           bottom: `<p>Ollie is napping until they say OK.</p><button class="btn-white" data-go="parent"><i class="ph-bold ph-device-mobile"></i>Open the grown-up's phone</button>` })}`,
 
       parent: () => {
-        const share = !!this.parentFor, buy = this.parentFor === 'buy';
+        const share = !!this.parentFor, buy = this.parentFor === 'buy' || this.parentFor === 'pass', outside = this.parentFor === 'outside';
         const perms = share
-          ? (buy ? [['ph-shopping-bag', 'Family Outing Pack · $4.99', 'One-time purchase through FastSpring', 'ask', 'Asking']] : [['ph-share-network', 'Share finds with friends', 'Photos and stories, friends only', 'ask', 'Asking']])
+          ? (outside ? [['ph-tree', 'Play outside', 'Nature bingo near home', 'ask', 'Asking'], ['ph-map-pin', 'Location', 'Only inside a play zone, never shared', 'yes', 'Zones only'], ['ph-camera', 'Camera', 'Stays off', 'no', 'Off']] : this.parentFor === 'pass' ? [['ph-gift', 'Teen Pass · $2.99/month', 'Deals at teen-friendly shops, no alcohol. Billed to you via FastSpring', 'ask', 'Asking']] : buy ? [['ph-shopping-bag', 'Family Outing Pack · $4.99', 'One-time purchase through FastSpring', 'ask', 'Asking']] : [['ph-share-network', 'Share finds with friends', 'Photos and stories, friends only', 'ask', 'Asking']])
           : [['ph-map-pin', 'Location', 'Only inside play zones, never shared', 'yes', 'Zones only'], ['ph-camera', 'Camera', 'Off for under 13', 'no', 'Off'],
              ['ph-users', 'Friends and sharing', 'Off for under 13', 'no', 'Off'], ['ph-shopping-bag', 'Buying', 'Off', 'no', 'Off']];
         return `${this.status(true)}
-        <div class="parent-top"><p class="eyebrow" style="color:rgba(255,255,255,.6)">Grown-up's phone · k-ID</p><h2 class="disp h-m" style="margin-top:4px">${buy ? `${p.name} wants to buy a pack` : share ? `${p.name} wants to share` : `${p.name} wants to join Explore Your Block`}</h2></div>
+        <div class="parent-top"><p class="eyebrow" style="color:rgba(255,255,255,.6)">Grown-up's phone · k-ID</p><h2 class="disp h-m" style="margin-top:4px">${outside ? `${p.name} wants to play outside` : this.parentFor === 'pass' ? `${p.name} asked for Teen Pass` : buy ? `${p.name} wants to buy a pack` : share ? `${p.name} wants to share` : `${p.name} wants to join Explore Your Block`}</h2></div>
         <div class="sheet" style="top:128px;border-radius:0;background:#fff">
-          <p class="p" style="margin-top:0">${buy ? `k-ID needs a parent's OK for purchases at ${p.age}.` : share ? `In Germany, under-16s need a parent's OK to share. Here's what turns on:` : `Here's what ${p.name} can do at age ${s.age}. You can change this anytime.`}</p>
+          <p class="p" style="margin-top:0">${outside ? `Ollie keeps ${p.name} inside a play zone around home. Nobody can see where ${p.name} is.` : this.parentFor === 'pass' ? `Get it as a gift. k-ID needs a parent's OK for purchases at ${p.age}.` : buy ? `k-ID needs a parent's OK for purchases at ${p.age}.` : share ? `In Germany, under-16s need a parent's OK to share. Here's what turns on:` : `Here's what ${p.name} can do at age ${s.age}. You can change this anytime.`}</p>
           <div style="margin-top:8px">${perms.map(([ic, t, d, cls, lab]) => `<div class="perm"><i class="ic ph ${ic}"></i><div><b>${t}</b><small>${d}</small></div><span class="tag ${cls}">${lab}</span></div>`).join('')}</div>
           <div class="grow"></div>
           <button class="btn btn-pill full" data-act="approve">Approve</button>
@@ -766,6 +817,30 @@ class Phone {
           <button class="btn btn-pill full" data-act="addGo">Next: pick their age</button>
         </div>`,
 
+      askOutside: () => `${this.status()}${stageScreen({ bg: '#DDF5EA', dome: '#22B88A', ink: '#1F2030', kick: 'Outside needs a grown-up', title: 'Can we go<br>outside?',
+          extra: floaties([['leaf', 8, 30, 36, -15], ['star', 82, 24, 28, 10, .6], ['spark', 14, 52, 16, 0, 1]]),
+          bottom: `<p>Ollie wants to play nature bingo! A grown-up needs to say OK first.</p>
+            <button class="btn-white big" data-act="askOutsideGo">Ask my grown-up</button>` })}
+        <button class="back" data-go="home" aria-label="Back"><i class="ph-bold ph-arrow-left"></i></button>`,
+
+      pass: () => { const teen = p.band === 'teen', list = passPartners(teen), canBuy = r.buying === 'yes' || s.passGift;
+        if (s.passOn) return `${this.status()}
+        <div class="plain" style="background:var(--paper)"></div>
+        <button class="back" data-go="home" aria-label="Back"><i class="ph-bold ph-arrow-left"></i></button>
+        <div class="sheet" style="top:0;border-radius:0;padding-top:86px;background:transparent;box-shadow:none;overflow-y:auto">
+          <p class="eyebrow">${teen ? 'Teen Pass' : 'Block Pass'} · active</p>
+          <h2 class="disp h-l" style="margin-top:4px">Your local deals</h2>
+          <div class="qr-card"><div class="qr">${Array.from({ length: 49 }, (_, i) => `<i style="opacity:${[0,1,2,3,4,5,6,7,13,14,20,21,27,28,34,35,41,42,43,44,45,46,47,48,10,16,24,30,32,38].includes(i) || (i * 7) % 5 === 0 ? 1 : 0}"></i>`).join('')}</div><div><b>Show at the counter</b><small>One scan per visit · ${teen ? 'teen-friendly shops only' : 'all partner shops'}</small></div></div>
+          <div class="stack">${list.map(x => `<div class="pcard"><div class="th" style="background:${x.color}"><i class="ph-fill ${x.icon}"></i></div><div style="flex:1"><b>${x.name}</b><small>${x.cat} · demo partner</small></div><span class="pill-st here">${x.deal}</span></div>`).join('')}</div>
+        </div>`;
+        return `${this.status()}${stageScreen({ bg: teen ? '#EEE8FF' : '#FFEBD6', dome: teen ? '#6C4BD8' : '#1F2030', ink: '#1F2030', kick: 'Local shops · FastSpring', title: teen ? 'Teen<br>Pass' : 'Block<br>Pass',
+          extra: floaties([['star', 8, 24, 30, -10], ['heart', 82, 20, 26, 12, .5]]),
+          bottom: `<div class="deal-row">${list.slice(0, 3).map(x => `<span><i class="ph-fill ${x.icon}"></i>${x.deal}<small>${x.name}</small></span>`).join('')}</div>
+            <p style="font-size:14px">${teen ? `Deals at ${list.length} teen-friendly shops. Never anywhere that sells alcohol.` : `Deals at ${list.length} local shops on your block.`}<br><b style="font-size:24px;font-family:var(--display);font-stretch:80%">${teen ? '$2.99' : '$4.99'} / month</b></p>
+            ${canBuy ? `<button class="btn-white" data-act="checkout" data-product="${teen ? 'Teen Pass' : 'Block Pass'}" data-price="${teen ? '2.99' : '4.99'}"><i class="ph-fill ph-lock-simple"></i>${s.passGift ? 'Accept the gift' : 'Get it with FastSpring'}</button>`
+              : r.buying === 'ask' ? `<button class="btn-white" data-act="askPass"><i class="ph-fill ph-gift"></i>Ask a parent to get it</button>` : ''}` })}
+        <button class="back" data-go="home" aria-label="Back"><i class="ph-bold ph-arrow-left"></i></button>`; },
+
       prohibited: () => `${this.status()}${stageScreen({ bg: '#EEF1FF', dome: '#7C8DB8', ink: '#1F2030', kick: 'Not quite yet', title: 'Too young<br>to play here',
           bottom: `<p>In your country, players need to be a little older for this game. Ollie will be right here when you are.</p><button class="btn-white" data-go="welcome">Back to start</button>` })}
         <span class="chip glass" style="position:absolute;z-index:9;top:46px;left:50%;transform:translateX(-50%)"><i class="ph-fill ph-shield-check"></i>k-ID: under the minimum age</span>`,
@@ -777,22 +852,34 @@ class Phone {
           extra: floaties([['star', 10, 24, 34, -10], ['heart', 82, 20, 30, 12, .5], ['leaf', 78, 46, 34, 20, 1], ['spark', 16, 48, 20, 0, .8]]),
           bottom: `<p>Let's go find some treasures on your block.</p><button class="btn-white big" data-go="home">Start exploring</button>` })}`,
 
-      home: () => k ? `
+      home: () => k ? (s.outside ? `
         <div class="scenebox" style="height:300px">${scene('day')}</div>${this.status()}
+        ${this.kidStars()}
+        <button class="corner-btn" data-go="finds" aria-label="My stickers"><i class="ph-fill ph-book-open"></i></button>
+        <div class="sheet" style="top:270px">
+          <p class="eyebrow"><i class="ph-fill ph-map-pin-area"></i> Outside · your grown-up said yes</p>
+          <h2 class="disp h-l" style="margin-top:4px">Nature bingo</h2>
+          <div class="bingo">${BINGO.map(([ic, t, c], i) => `<button class="bcell ${s.bingo[i] ? 'got' : ''}" data-act="bingo" data-i="${i}" style="--c:${c}"><i class="ph-fill ${ic}"></i><small>${t}</small>${s.bingo[i] ? '<span class="tick"><i class="ph-bold ph-check"></i></span>' : ''}</button>`).join('')}</div>
+          <div class="grow"></div>
+          <button class="btn btn-pill light full" data-act="goInside"><i class="ph-bold ph-house"></i>Back inside</button>
+        </div>` : `
+        <div class="scenebox" style="height:300px">${house()}</div>${this.status()}
         ${this.kidStars()}
         <button class="corner-btn" data-go="finds" aria-label="My stickers"><i class="ph-fill ph-book-open"></i></button>
         ${this.profiles.length > 1 ? `<button class="corner-btn" style="right:68px;background:${p.color};color:#fff;font:800 18px var(--display)" data-go="profiles" aria-label="Switch profile">${p.name[0]}</button>` : ''}
         <div class="sheet" style="top:270px">
-          <p class="eyebrow">Today's outing · playground, park, ice cream</p>
-          <h2 class="disp h-l" style="margin-top:4px">Park day hunt</h2>
-          <div class="kpath">
-            <svg viewBox="0 0 300 150" preserveAspectRatio="none"><path d="M30 110 C 70 30, 110 30, 140 80 S 220 140, 270 40" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 14"/></svg>
-            ${HUNT.map((h, i) => { const pos = [[10, 72], [33, 30], [50, 56], [72, 84], [90, 30]][i]; const st = i < s.found ? 'done' : i === s.found ? 'now' : 'lock';
-              return `<div class="stop ${st}" style="left:${pos[0]}%;top:${pos[1]}%" ${st === 'now' ? 'data-go="task"' : ''}><span style="${st !== 'lock' ? `background:${h.color}` : ''}"><i class="ph-fill ${st === 'lock' ? 'ph-lock-simple' : h.icon}"></i></span></div>`; }).join('')}
+          <p class="eyebrow">Inside games · today</p>
+          <h2 class="disp h-l" style="margin-top:4px">Home explorer</h2>
+          <div class="kpath" style="background:#FFF1E2">
+            <svg viewBox="0 0 300 150" preserveAspectRatio="none"><path d="M30 110 C 70 30, 110 30, 140 80 S 220 140, 270 40" fill="none" stroke="#E8C9A6" stroke-width="6" stroke-linecap="round" stroke-dasharray="1 14"/></svg>
+            ${INSIDE.map((g, i) => { const pos = [[12, 70], [36, 32], [58, 64]][i]; const st = i < (s.game || 0) ? 'done' : i === (s.game || 0) ? 'now' : 'lock';
+              return `<div class="stop ${st}" style="left:${pos[0]}%;top:${pos[1]}%" ${st === 'now' ? 'data-go="task"' : ''}><span style="${st !== 'lock' ? `background:${g.color}` : ''}"><i class="ph-fill ${st === 'lock' ? 'ph-lock-simple' : g.icon}"></i></span></div>`; }).join('')}
+            <div class="stop door" style="left:86%;top:36%" data-go="askOutside"><span><i class="ph-fill ph-tree"></i></span></div>
           </div>
           <div class="grow"></div>
-          <button class="btn btn-kid blue nudge" data-go="task">Next: ${HUNT[Math.min(s.found, 4)].name.toLowerCase()} at ${HUNT[Math.min(s.found, 4)].at}</button>
-        </div>`
+          <button class="btn btn-kid blue nudge" data-go="task">${(s.game || 0) < INSIDE.length ? `Play: ${INSIDE[s.game || 0].label}` : 'All done inside!'}</button>
+          <button class="btn btn-pill light full" style="margin-top:8px" data-go="askOutside"><i class="ph-fill ph-tree"></i>Can we go outside?<i class="ph-fill ph-lock-simple" style="opacity:.5"></i></button>
+        </div>`)
       : adult ? (s.family ? `
         <div class="leaf" style="height:340px" data-map="near" data-keys="${FAMILY.join(',')}"></div>${this.status()}
         <div class="sheet family-sheet" style="top:300px;padding:18px 16px 16px">
@@ -824,15 +911,20 @@ class Phone {
             <div><h3 class="disp h-m" style="font-size:23px">Top of Dolores Park</h3><div class="meta"><span><i class="ph ph-map-pin"></i>0.1 mi</span><span><i class="ph ph-sun-horizon"></i>Best view</span></div>
               <span class="chip" style="margin-top:8px;background:#fff"><i class="ph-fill ph-seal-check" style="color:var(--mint)"></i>${s.finds} spots so far</span></div>
           </div>
-          <div class="stack">${this.spotCard('ritual')}${this.spotCard('clarion')}</div>
+          <div class="stack">${this.spotCard('ritual')}</div>
+          <button class="pass-cta" data-go="pass"><span><i class="ph-fill ph-ticket"></i></span><div><b>${s.passOn ? 'Teen Pass is on' : 'Teen Pass'}</b><small>${s.passOn ? 'See your deals' : 'Deals at teen-friendly shops · no alcohol'}</small></div><i class="ph-bold ph-caret-right"></i></button>
         </div>${this.topActions()}${this.vnav('home')}${this.arrive('park', 'Snap it')}`,
 
-      task: () => k ? `${this.status(true)}${stageScreen({ bg: '#178A74', dome: '#25A98C', kick: `<span data-act="say" style="cursor:pointer;pointer-events:auto"><i class="ph-fill ph-speaker-high"></i> At ${HUNT[Math.min(s.found, 4)].at}</span>`, title: `Find ${HUNT[Math.min(s.found, 4)].name.toLowerCase()}!`,
-          extra: floaties([['leaf', 6, 34, 36, -15], ['pin', 84, 36, 30, 10, .7], ['spark', 12, 54, 16, 0, 1.1]]),
-          bottom: `<div class="hint-dots">${HUNT[Math.min(s.found, 4)].hint.map(c => `<i style="background:${c}"></i>`).join('')}</div>
-            <p style="font-size:13px"><i class="ph-fill ph-map-pin-area"></i> You're in the play zone</p>
-            <button class="btn-white big nudge" data-go="quiz">I found it!</button>` })}
-        <button class="back right" data-go="home" aria-label="Close"><i class="ph-bold ph-x"></i></button>` : `
+      task: () => k ? (() => { const g = this.curGame();
+        const bot = g.hint ? `<div class="hint-dots">${g.hint.map(c => `<i style="background:${c}"></i>`).join('')}</div>`
+          : g.shapes ? `<div class="hint-dots">${g.shapes.map(ic => `<i style="background:#fff;display:grid;place-items:center;color:#4C6FFF;font-size:22px;font-style:normal"><span class="ph-fill ${ic}"></span></i>`).join('')}</div>`
+          : g.bingo ? `<div class="hint-dots"><i style="background:#fff;display:grid;place-items:center;color:${g.color};font-size:22px;font-style:normal"><span class="ph-fill ${g.icon}"></span></i></div>` : '';
+        return `${this.status(true)}${stageScreen({ bg: g.bingo ? '#2E7D5B' : g.riddle ? '#6C4BD8' : '#178A74', dome: g.bingo ? '#3FA06F' : g.riddle ? '#8467E8' : '#25A98C',
+          kick: `<span data-act="say" style="cursor:pointer;pointer-events:auto"><i class="ph-fill ph-speaker-high"></i> ${g.where}</span>`, title: g.title,
+          extra: floaties(g.bingo ? [['leaf', 6, 34, 36, -15], ['spark', 84, 36, 18, 0, .7]] : [['star', 8, 34, 30, -10], ['spark', 84, 38, 18, 0, .7]]),
+          bottom: `${bot}<p style="font-size:13px"><i class="ph-fill ${g.bingo ? 'ph-map-pin-area' : 'ph-house'}"></i> ${g.bingo ? "You're in the play zone" : 'Look around inside'}</p>
+            <button class="btn-white big nudge" data-go="${g.bingo ? 'celebrate' : 'quiz'}" ${g.bingo ? 'data-act="bingoFound"' : ''}>${g.riddle ? 'I know it!' : 'I found it!'}</button>` })}
+        <button class="back right" data-go="home" aria-label="Close"><i class="ph-bold ph-x"></i></button>`; })() : `
         <div class="hero-img" style="background-image:url(${here.img})"><div class="lab"><span class="chip glass">${adult ? 'Stop 1 of 4 · History' : 'Hangout · Dolores Park'}</span></div></div>${this.status(true)}
         <button class="back" data-go="home" aria-label="Back"><i class="ph-bold ph-arrow-left"></i></button>
         <div class="sheet" style="top:276px">
@@ -846,11 +938,11 @@ class Phone {
         </div>`,
 
       quiz: () => `
-        <div class="scenebox" style="height:300px">${scene('day')}</div>${this.status()}
+        <div class="scenebox" style="height:300px">${house()}</div>${this.status()}
         <div class="sheet center" style="top:270px">
           <button class="chip blue" style="border:0;cursor:pointer" data-act="say"><i class="ph-fill ph-speaker-high"></i>Ollie asks</button>
-          <h2 class="disp h-l" style="margin-top:10px">Ooh! What was it?</h2>
-          <div class="quiz">${[['ph-apple-logo', 'An apple'], ['ph-door', 'A door'], ['ph-car-profile', 'A car'], ['ph-flower-tulip', 'A flower']].map(([ic, t]) => `<button data-act="pick"><i class="ph-fill ${ic}"></i>${t}</button>`).join('')}</div>
+          <h2 class="disp h-l" style="margin-top:10px">${this.curGame().riddle ? 'What am I?' : 'Ooh! What was it?'}</h2>
+          <div class="quiz">${this.curGame().quiz.map(([ic, t, ok]) => `<button data-act="pick" ${ok ? 'data-ok="1"' : ''}><i class="ph-fill ${ic}" style="color:${this.curGame().color}"></i>${t}</button>`).join('')}</div>
         </div>`,
 
       camera: () => `
@@ -865,7 +957,7 @@ class Phone {
 
       celebrate: () => k ? `${this.status()}${stageScreen({ bg: '#FFEBD6', dome: '#FF8A4C', ink: '#1F2030', title: 'You<br>found it!',
           extra: floaties([['star', 8, 22, 36, -12], ['heart', 82, 18, 30, 10, .4], ['spark', 86, 44, 22, 0, .8], ['star', 12, 46, 24, 15, 1.2]]),
-          bottom: `<div class="sticker-big" style="width:96px;height:96px;padding:7px;margin-top:-30px"><span style="background:${HUNT[s.found - 1].color};font-size:40px"><i class="ph-fill ${HUNT[s.found - 1].icon}"></i></span></div>
+          bottom: `<div class="sticker-big" style="width:96px;height:96px;padding:7px;margin-top:-30px"><span style="background:${(s.lastWin || INSIDE[0]).color};font-size:40px"><i class="ph-fill ${(s.lastWin || INSIDE[0]).icon}"></i></span></div>
             <div class="mini-stats"><span><b data-count="${s.found}">0</b> stickers</span><span><b data-count="1240">0</b> steps</span></div>
             <button class="btn-white big" data-go="home">Keep going</button>` })}` : `
         ${adult ? `<div class="hero-img" style="height:250px;background-image:url(${MD.img})"></div>` : `<div class="scenebox dusk" style="height:250px">${scene('dusk')}</div>`}${this.status(true)}
@@ -1082,6 +1174,8 @@ class Phone {
     if (walk) L.polyline(WALK.map(k2 => [PLACES[k2].lat, PLACES[k2].lng]), { color: '#1F2030', weight: 4, opacity: .8, dashArray: '1 9', lineCap: 'round' }).addTo(map);
     const keys = el.dataset.keys ? el.dataset.keys.split(',') : walk ? WALK : FOR_BAND[this.p.band];
     keys.forEach((k2, i) => pin(PLACES[k2], walk ? String(i + 1) : '', home ? '' : PLACES[k2].name.replace('The ', '')).addTo(map));
+    if (this.s.passOn) passPartners(this.p.band === 'teen').forEach(x => L.marker([x.lat, x.lng], { icon: L.divIcon({ className: '', iconSize: [36, 46], iconAnchor: [18, 46],
+      html: `<div class="mpin"><span style="background:${x.color}"><i class="ph-fill ${x.icon}"></i></span><em class="mlabel" style="font-style:normal;background:var(--mint);color:#fff">${x.deal}</em></div>` }) }).addTo(map));
     const me = walk ? PLACES.md : PLACES.park;
     L.marker([me.lat - .0004, me.lng + .0005], { icon: L.divIcon({ className: '', iconSize: [18, 18], iconAnchor: [9, 9], html: '<div class="udot"></div>' }) }).addTo(map);
     const b = L.latLngBounds(keys.map(k2 => [PLACES[k2].lat, PLACES[k2].lng]));
@@ -1158,15 +1252,16 @@ class Phone {
     if (a === 'startGroup') { this.groupMode = true; this.go('group'); this.toast('Mia, Lena and Sam are in', 'ph-users-three'); }
     if (a === 'askDone') { this.s.askDone = true; this.render('none'); this.ollie.setAttribute('mood', 'wave'); setTimeout(() => this.ollie.say && this.ollie.say(3200), 60); }
     if (a === 'checkout') {
+      const prod = el.dataset.product || 'Family Outing Pack', price = +(el.dataset.price || 4.99), monthly = !!el.dataset.product;
       const sh = document.createElement('div'); sh.className = 'fs-sheet';
       sh.innerHTML = `<div class="fs-card"><div style="display:flex;justify-content:space-between;align-items:center"><b style="font-size:13px;letter-spacing:1px">FASTSPRING · SECURE CHECKOUT</b><i class="ph-fill ph-lock-simple"></i></div>
-        <div style="display:flex;justify-content:space-between;margin-top:14px;font-weight:800"><span>Family Outing Pack</span><span>$4.99</span></div>
-        <div style="display:flex;justify-content:space-between;color:var(--ink-2);font-size:13px;font-weight:700;margin-top:4px"><span>Sales tax (handled by FastSpring)</span><span>$0.43</span></div>
-        <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-weight:900"><span>Total</span><span>$5.42</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;font-weight:800"><span>${prod}</span><span>$${price.toFixed(2)}${monthly ? '/mo' : ''}</span></div>
+        <div style="display:flex;justify-content:space-between;color:var(--ink-2);font-size:13px;font-weight:700;margin-top:4px"><span>Sales tax (handled by FastSpring)</span><span>$${(price * .0863).toFixed(2)}</span></div>
+        <div style="display:flex;justify-content:space-between;margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-weight:900"><span>Total</span><span>$${(price * 1.0863).toFixed(2)}</span></div>
         <button class="btn btn-pill full" style="margin-top:14px" data-pay="1"><i class="ph-fill ph-apple-logo"></i>Pay</button>
         <small style="display:block;text-align:center;color:var(--ink-3);font-weight:700;margin-top:8px">Sandbox · no real charge</small></div>`;
       this.phoneEl.querySelector('.screen').appendChild(sh);
-      sh.querySelector('[data-pay]').onclick = () => { sh.remove(); this.s.bought = true; this.render('pop'); this.confetti(); };
+      sh.querySelector('[data-pay]').onclick = () => { sh.remove(); if (monthly) { this.s.passOn = true; this.render('pop'); this.toast(`${prod} is on`, 'ph-ticket'); } else { this.s.bought = true; this.render('pop'); } this.confetti(); };
     }
     if (a === 'askBuy') { this.parentFor = 'buy'; this.go('parent'); }
     if (a === 'tog') { el.classList.toggle('on'); if (navigator.vibrate) navigator.vibrate(6); }
@@ -1174,11 +1269,20 @@ class Phone {
     if (a === 'sendAsk') { this.s.asked = {}; this.render('none'); this.toast('Sent to your parent', 'ph-paper-plane-tilt'); }
     if (a === 'dismiss') { const ar = this.phoneEl.querySelector('#arrive'); ar.style.transition = 'transform .4s ease'; ar.style.transform = 'translateY(140%)'; }
     if (a === 'pick') {
+      const g = this.curGame();
+      if (g.riddle && !el.dataset.ok) { el.classList.add('dim'); this.toast('Hmm, not quite. Try again!', 'ph-question'); this.ollie.setAttribute('mood', 'search'); return; }
       el.classList.add('picked'); el.parentNode.querySelectorAll('button').forEach(b => b !== el && b.classList.add('dim'));
       this.ollie.removeAttribute('talking'); this.ollie.setAttribute('mood', 'cheer');
-      setTimeout(() => { this.s.found = Math.min(this.s.found + 1, HUNT.length); this.go('celebrate'); }, 750);
+      setTimeout(() => { this.s.lastWin = g; this.s.game = Math.min((this.s.game || 0) + 1, INSIDE.length); this.s.found = Math.min(this.s.found + 1, HUNT.length); this.go('celebrate'); }, 750);
     }
+    if (a === 'bingo') { this.s.bingoNow = +el.dataset.i; this.go('task'); }
+    if (a === 'bingoFound') { const i = this.s.bingoNow ?? 0; this.s.bingo[i] = 1; this.s.lastWin = this.curGame(); this.s.found = Math.min(this.s.found + 1, HUNT.length); this.go('celebrate'); return; }
+    if (a === 'goInside') { this.s.outside = false; this.render('none'); }
+    if (a === 'askOutsideGo') { this.parentFor = 'outside'; this.go('parent'); }
+    if (a === 'askPass') { this.parentFor = 'pass'; this.go('parent'); }
     if (a === 'approve') {
+      if (this.parentFor === 'outside') { this.s.outside = true; this.parentFor = null; this.go('home'); this.toast('Your grown-up said yes!', 'ph-tree'); this.confetti(); return; }
+      if (this.parentFor === 'pass') { this.s.passOn = true; this.parentFor = null; this.go('pass'); this.toast('Your parent gifted you Teen Pass', 'ph-gift'); this.confetti(); return; }
       if (this.parentFor === 'buy') { this.s.packOk = true; this.parentFor = null; this.go('pack'); this.toast('Parent approved the pack'); return; }
       if (this.parentFor === 'share') {
         this.s.shareOk = true; this.parentFor = null;
@@ -1187,7 +1291,7 @@ class Phone {
         setTimeout(() => { this.go('share'); this.toast('Parent approved sharing'); }, 900);
       } else this.go('approved');
     }
-    if (a === 'deny') { const f = this.parentFor; this.parentFor = null; this.go(f === 'share' ? 'celebrate' : f === 'buy' ? 'pack' : 'denied'); }
+    if (a === 'deny') { const f = this.parentFor; this.parentFor = null; this.go(f === 'share' ? 'celebrate' : f === 'buy' ? 'pack' : f === 'pass' ? 'pass' : f === 'outside' ? 'home' : 'denied'); }
     if (a === 'snap') {
       const scr = this.phoneEl.querySelector('.screen'), cam = scr.querySelector('.cam');
       const f = document.createElement('div'); f.className = 'flash'; scr.appendChild(f);
@@ -1235,7 +1339,7 @@ function mount(screen) {
   document.getElementById('cmp').setAttribute('aria-pressed', compare);
   const ids = compare ? ['mia', 'lena', 'sam'] : [current];
   stage.innerHTML = ids.map(id => `<div class="phone-col">${compare ? `<span class="who">${PLAYERS[id].name}, ${PLAYERS[id].age} · ${PLAYERS[id].country}</span>` : ''}<div class="host"></div></div>`).join('');
-  [...stage.querySelectorAll('.host')].forEach((h, i) => new Phone(h, ids[i], { screen: screen || (compare ? 'home' : 'welcome'), family: q.get('fam') }));
+  [...stage.querySelectorAll('.host')].forEach((h, i) => new Phone(h, ids[i], { screen: screen || (compare ? 'home' : 'welcome'), family: q.get('fam'), outside: q.get('out') }));
   renderConsole();
 }
 const q = new URLSearchParams(location.search);

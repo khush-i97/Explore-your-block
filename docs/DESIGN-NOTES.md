@@ -45,6 +45,31 @@ The locks protect older profiles: a kid on a family phone can't open a teen's or
 
 Pick who's going. The app shows only the spots that suit everyone and follows the strictest k-ID rules in the group (usually the youngest): location sharing off, chat filtered, no buying for kids. An adult buys a Family Outing Pack on their own phone (FastSpring), and it unlocks for the group.
 
+## Kids: inside by default, outside with a grown-up's OK
+
+- Inside games (no camera, no location): Color hunt ("Find something red!"), Shape safari ("Find something round!"), Ollie's riddles ("I'm soft and you sleep on me").
+- "Can we go outside?" → the grown-up approves on their phone (our own approval step; k-ID has no "go outside" permission) → Nature bingo: a bird in a tree, a yellow flower, a big leaf, a cloud animal, a dog on a walk, a butterfly. Location only counts inside a play zone and is never shared.
+
+## Family mode (adults)
+
+A "Just me | Family" switch on the adult home. "Who's with you?" asks only the kids' ages (no accounts for them). Family mode swaps to family-friendly spots and searches and can start Ollie's sticker hunt for the kids on the parent's phone.
+
+## No alcohol for kids and teens
+
+Kid and teen spots never include places that sell alcohol. Anything we can't confirm stays adult-only. In the real app, Google Places' serves-beer and serves-wine flags can do this automatically.
+
+## FastSpring: local discounts
+
+- **Block Pass** (adults, $4.99/month placeholder): deals at local small businesses, shown as deal pins on the map and a QR code at the counter.
+- **Teen Pass** ($2.99/month placeholder): teen-friendly shops only, never anywhere that sells alcohol. Teens ask a parent, who buys it as a gift (k-ID `in-game-purchases` = GUARDIAN).
+- **Family Outing Pack:** a one-time group unlock.
+- Partner shops in the demo (Mission Boba, Lucky Comics, Pixel Pit Arcade, Sunday Coffee Co., Valencia Vinyl) are made up. No real business has signed up.
+- Business model idea: shops pay a monthly listing fee through FastSpring to be featured.
+
+## Google Maps
+
+"Walk there in Google Maps" and whole-route buttons use Google Maps direction links (no key). Embedding a real Google map needs a Maps JavaScript API key restricted to our domains.
+
 ## Partners
 
 - **k-ID:** age, location, parent consent, every permission, and the group's strictest rules.
